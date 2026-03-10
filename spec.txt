@@ -1,0 +1,480 @@
+工业金属零件高精度尺寸测量系统：基于
+YOLO-OBB与亚像素卡尺的实时视觉架构与
+算法研究
+引言与前沿文献解析
+在工业4.0的演进框架下，高精度的非接触式度量（Metrology）已成为闭环制造与质量控制的核心
+基石。传统的接触式三坐标测量机（CMM）虽具备微米级精度，但在面对高通量、柔性化的实时金
+属零件测量时，其低效性成为了不可逾越的物理瓶颈。为此，基于计算机视觉与深度学习的自动
+化检测系统逐渐主导了工业现场。
+梳理近年来在顶级学术会议（CVPR, ICRA, IROS, ECCV, ICCV）及arXiv上发表的文献，工业缺陷检
+测与度量技术正经历着从“封闭集（Closed-set）”向“开放集（Open-set）”范式的深刻转换。相关综
+述论文《Industrial Defect Detection: A Survey》指出，面对现代制造系统中激增的精度与自动化
+期望，常规方法在处理复杂光照与尺度变化时显得捉襟见肘 。而在具体的目标定位与度量领域，
+定向边界框（Oriented Bounding Box, OBB）因其能紧密贴合物体真实几何轮廓，成为金属零件位
+姿估计的最佳选择。例如，基于改进YOLO架构的工业表面缺陷检测算法，通过在颈部网络嵌入
+坐标注意力机制（Coordinate Attention）并优化回归损失函数，显著提升了密集与重叠零件的特
+征提取能力与定位精度 。
+在亚像素级边缘定位的数学模型方面，传统算法多基于曲面拟合或矩估计（如空间矩、Zernike
+矩）。最新发表的研究提出了一种称为“转换强度求和（Converted Intensity Summation, CIS）”的
+亚像素边缘定位方法，通过将像素级强度解释为强度模型中的局部积分映射，结合稳定边缘区域（
+Stable Edge Region, SER）以抵御局部干扰，从而在执行效率和定位精度上超越了最先进的拟合
+方法 。本报告将吸收这些学术界的前沿核心贡献，设计一套运行于Linux环境，结合微调
+YOLO-OBB与亚像素卡尺（Caliper）算法的C++高性能测量系统。
+
+光学系统建模与硬件参数优化方案
+视觉测量系统的测量上限受制于前端光学成像链路的衍射极限与采样频率。本系统根据给定的硬
+件清单，采用高分辨率全局快门工业相机与超低畸变定焦镜头。
+
+相机与镜头参数的物理意义
+系统选用 Hikrobot MV-CE013-80UM 全局快门相机。其搭载的 1/2.7 英寸 CMOS 传感器具备
+1280 × 1024 的物理分辨率，像元尺寸为 4.0 µm × 4.0 µm，动态范围大于 60 dB 4。全局快门的应
+用在物理层面上消除了传送带高速运动零件可能产生的果冻效应（Rolling Shutter Artifacts），确
+保了高频边缘信息的保真度。
+匹配的镜头为 Hikrobot MVL-HF0828M-6MPE，焦距为 8 mm，支持 600 万像素解析力。该镜头在
+机械视觉应用中的核心优势在于其极低的光学畸变率（标称畸变率低至 0.049%，TV 畸变 -0.39%
+），且在 0.1 m 的超短工作距离下依然能够维持卓越的对比度 6。由于该镜头的最大成像圈为 $\Phi
+9$ mm（适配 1/1.8 英寸靶面），远大于相机的 1/2.7 英寸靶面（对角线约 6.55 mm），因此系统成像
+
+能够完美避开镜头边缘的相对照度衰减与高阶像差区域 8。
+
+空间分辨率与极限精度推导
+为了将像素尺寸转化为真实世界尺寸，需建立光学放大率（Magnification, $M$）模型。假设用户定
+义的工作距离（Working Distance, $WD$）为 100 mm。根据高斯成像公式：
+$$M = \frac{f}{WD - f}$$
+代入焦距 $f = 8$ mm 与 $WD = 100$ mm，计算可得放大率 $M \approx 0.0869$ 10。
+基于此放大率，物体平面上对应于单个像素的实际物理尺寸（$P_{object}$）可通过像元尺寸（
+$S_{pixel}$）计算：
+$$P_{object} = \frac{S_{pixel}}{M} = \frac{4.0 \mu m}{0.0869} \approx 46.0 \mu m / \text{pixel}$$
+这意味着在 100 mm 的工作距离下，图像中每一个像素代表真实世界中约 0.046 mm 的距离。根
+据奈奎斯特-香农采样定理，可靠的边缘特征通常需要跨越 2 到 3 个像素 11。若采用纯像素级算法
+，系统测量精度受限于 $\pm 46.0 \mu m$；然而，通过本报告后续推导的一维抛物线亚像素插值
+算法，可将边缘定位精度提升至 $1/10$ 至 $1 / 50$ 像素量级，即系统的理论极限测量精度可突破
+至 $1 \sim 5 \mu m$。
+
+空间定位技术对比：LiDAR-based SLAM 与 Vision-based
+SLAM
+在自动化车间中，金属尺寸测量系统常被搭载于自主移动机器人（AMR）或机械臂末端执行器上，
+以进行柔性化的多工位扫描。此时，系统需要依赖同步定位与建图（SLAM）技术来获取相机的全
+局位姿。对比激光雷达与视觉 SLAM 路线，对于微观精密测量任务具有重要的架构指导意义。
+技术评估维度
+精度与空间分辨率
+
+鲁棒性与环境适应
+
+功耗、成本与体积
+
+LiDAR-based SLAM (激光雷 Vision-based SLAM (纯视觉)
+达)
+提供直接的物理深度（$Z$轴） 深度信息依赖多视图几何（SfM）
+测量，全局轨迹累积误差极低 或双目视差间接解算，长距离轨
+（毫米至厘米级）。但其发射的 迹易产生尺度漂移。但能在 2D
+点云极其稀疏，无法捕捉金属表 平面上提供数以百万计的密集
+面的微小划痕、边缘公差等高频 像素阵列，对局部微米级边缘极
+其敏感，是度量的核心。
+结构信息 12。
+主动发光，不受工业现场光照剧 极度依赖被动光照。金属零件镜
+烈变化、金属表面高光反射或阴 面反射（Specular Reflection）极
+影的干扰。在无纹理的白墙或 易导致特征点（如 ORB, SIFT）提
+黑暗环境中表现优异。
+取失败或误匹配。通常需要结合
+偏振滤光片与同轴同向光源进
+行物理干预。
+机械旋转或固态激光雷达功耗 相机模块功耗极低（微瓦至毫瓦
+高（10W-30W+），硬件成本昂贵 级），成本低廉（本文选型相机
+（千美元级别以上），体积与重量 仅数百美元），体积微缩（
+
+较大，限制了其在轻量化机械臂 29×29×30mm）13，可实现高度集
+末端的集成 12。
+成。
+后处理算力需求
+依赖迭代最近点（ICP）或正态分 依赖非线性图优化（Bundle
+布变换（NDT）进行点云配准，对 Adjustment）与深度学习特征提
+CPU 依赖度较高。
+取，需借助 GPU 或 NPU 实现实
+时高帧率处理 12。
+综合结论：针对工业金属卡尺与零件的尺寸测量，“获取轮廓的极高频二维细节”是首要任务，
+LiDAR 的稀疏性使其在此类微距高精度任务中失去效用。因此，Vision-based SLAM 或固定的多
+目视觉标定系统是该场景下的唯一合理路径。
+
+机器人运动学与概率滤波跟踪数学推导
+在连续视频流的测量中，为了抵抗由于网络波动导致的边界框跳动（Jitter），以及在机械臂动态扫
+描中解算零件坐标，系统需要建立严谨的机器人运动学与概率滤波状态空间模型。
+
+机器人运动学：齐次变换与雅可比矩阵
+假设相机搭载于一台 6 自由度（6-DoF）工业机械臂的末端（Eye-in-Hand 架构）。为求得相机在机
+器人基坐标系下的位姿，采用 Denavit-Hartenberg (D-H) 参数法构建连杆坐标系。
+相邻连杆 $i-1$ 到连杆 $i$ 的齐次变换矩阵 $\mathbf{T}_{i-1}^i$ 由四步基本变换构成：
+$$\mathbf{T}_{i-1}^i = \text{Rot}_z(\theta_i) \text{Trans}_z(d_i) \text{Trans}_x(a_i)
+\text{Rot}_x(\alpha_i)$$
+展开后得到：
+$$\mathbf{T}_{i-1}^i = \begin{bmatrix} \cos\theta_i & -\sin\theta_i\cos\alpha_i &
+\sin\theta_i\sin\alpha_i & a_i\cos\theta_i \\ \sin\theta_i & \cos\theta_i\cos\alpha_i &
+-\cos\theta_i\sin\alpha_i & a_i\sin\theta_i \\ 0 & \sin\alpha_i & \cos\alpha_i & d_i \\ 0 & 0 & 0 & 1
+\end{bmatrix}$$
+末端执行器（即相机）相对于基座的正向运动学为各矩阵的连乘：
+$$\mathbf{T}_0^6(q) = \mathbf{T}_0^1(q_1) \mathbf{T}_1^2(q_2) \dots \mathbf{T}_5^6(q_6)$$
+为了在视觉伺服（Visual Servoing）中控制相机的运动以对准零件，需推导几何雅可比矩阵
+$\mathbf{J}(q)$。雅可比矩阵将关节空间的速度 $\dot{q}$ 映射到笛卡尔空间的线速度
+$\mathbf{v}$ 与角速度 $\boldsymbol{\omega}$：
+$$\begin{bmatrix} \mathbf{v} \\ \boldsymbol{\omega} \end{bmatrix} = \mathbf{J}(q) \dot{q} =
+\begin{bmatrix} \mathbf{J}_v \\ \mathbf{J}_\omega \end{bmatrix} \dot{q}$$
+对于旋转关节 $i$，其对应列向量为：
+$$\mathbf{J}_i = \begin{bmatrix} \mathbf{z}_{i-1} \times (\mathbf{p}_e - \mathbf{p}_{i-1}) \\
+\mathbf{z}_{i-1} \end{bmatrix}$$
+其中，$\mathbf{z}_{i-1}$ 为关节旋转轴的方向向量，$\mathbf{p}_e$ 为末端坐标，
+$\mathbf{p}_{i-1}$ 为连杆原点坐标。
+
+概率滤波：扩展卡尔曼滤波 (EKF) 与粒子滤波 (Particle Filter)
+在获取了包含坐标 $(x, y)$ 与旋转角度 $\theta$ 的 YOLO-OBB 输出后，直接进行后续处理容易
+受测量噪声影响。系统引入状态估计机制。
+1. 扩展卡尔曼滤波 (EKF) 推导
+定义零件在图像中的状态向量 $\mathbf{x}_k = [x, y, \theta, \dot{x}, \dot{y}, \dot{\theta}]^T$。
+由于动态传送带上的零件运动模型是非线性的，状态转移方程设为 $\mathbf{x}_{k} =
+f(\mathbf{x}_{k-1}) + \mathbf{w}_k$。
+利用泰勒一阶展开，计算雅可比矩阵 $\mathbf{F}_k = \left. \frac{\partial f}{\partial \mathbf{x}}
+\right|_{\hat{\mathbf{x}}_{k-1|k-1}}$。
+●​ 预测步：​
+$$\hat{\mathbf{x}}_{k|k-1} = f(\hat{\mathbf{x}}_{k-1|k-1})$$​
+$$\mathbf{P}_{k|k-1} = \mathbf{F}_k \mathbf{P}_{k-1|k-1} \mathbf{F}_k^T + \mathbf{Q}$$​
+其中 $\mathbf{Q}$ 为过程噪声协方差。
+●​ 更新步：​
+观测模型 $\mathbf{z}_k = h(\mathbf{x}_k) + \mathbf{v}_k$。观测雅可比 $\mathbf{H}_k =
+\left. \frac{\partial h}{\partial \mathbf{x}} \right|_{\hat{\mathbf{x}}_{k|k-1}}$。​
+卡尔曼增益 $\mathbf{K}_k$ 为：​
+$$\mathbf{K}_k = \mathbf{P}_{k|k-1} \mathbf{H}_k^T (\mathbf{H}_k \mathbf{P}_{k|k-1}
+\mathbf{H}_k^T + \mathbf{R})^{-1}$$​
+后验状态与协方差更新：​
+$$\hat{\mathbf{x}}_{k|k} = \hat{\mathbf{x}}_{k|k-1} + \mathbf{K}_k (\mathbf{z}_k h(\hat{\mathbf{x}}_{k|k-1}))$$​
+$$\mathbf{P}_{k|k} = (\mathbf{I} - \mathbf{K}_k \mathbf{H}_k) \mathbf{P}_{k|k-1}$$
+2. 粒子滤波 (Particle Filter) 补充
+当面对高度相似的对称金属零件，YOLO 模型可能会输出多峰（Multi-modal）分布的旋转角度（例
+如 $0^\circ$ 和 $180^\circ$ 被频繁混淆），EKF 的高斯假设会失效。此时，基于序列重要性重采样
+（Sequential Importance Resampling, SIR）的粒子滤波更为适用。
+状态后验概率由 $N$ 个带有权重 $w_k^{(i)}$ 的粒子表示：
+$$p(\mathbf{x}_k | \mathbf{z}_{1:k}) \approx \sum_{i=1}^N w_k^{(i)} \delta(\mathbf{x}_k \mathbf{x}_k^{(i)})$$
+更新粒子的权重依赖于观测似然：
+$$w_k^{(i)} = w_{k-1}^{(i)} \cdot p(\mathbf{z}_k | \mathbf{x}_k^{(i)})$$
+最后进行重采样（Resampling）以消除粒子退化现象。
+
+深度学习管线：YOLO-OBB 模型训练与 PyTorch 实现
+由于常规的水平边界框（HBB）在框选任意角度放置的细长型测量卡尺或零件时，会包含大量无用
+的背景信息，严重干扰后续的图像切片投影与灰度微分。因此，引入具备角度回归能力的定向边
+界框网络（YOLO-OBB）是本系统的核心创新 14。
+
+模型架构与训练管线
+YOLOv8-OBB 的核心在于回归层输出了附加的旋转角度 $\theta$。内部数据流采用 xywhr 格式
+表示，即中心坐标、宽、高以及取值范围被严格约束在 $[-\pi/2, \pi/2)$ 的弧度角 14。
+以下为构建高质量、模块化的 PyTorch 训练管线的 Python 示例代码，旨在让用户能够对采集的
+特定金属零件进行自监督微调：
+Python
+
+import torch​
+from ultralytics import YOLO​
+import argparse​
+import os​
+​
+def setup_training_pipeline(data_yaml: str, epochs: int = 100, imgsz: int = 640):​
+"""​
+高质量 YOLO-OBB 训练管线配置​
+采用 PyTorch 架构，支持多 GPU 分布式数据并行 (DDP) 与混合精度训练 (AMP)。​
+"""​
+# 验证是否支持 CUDA 加速​
+device = "cuda" if torch.cuda.is_available() else "cpu"​
+print(f"[*] Initializing training pipeline on device: {device}")​
+​
+# 载入预训练的 YOLOv8-OBB 权重以加速收敛 (基于 DOTA 数据集预训练)​
+# yolo26n-obb.pt 或 yolov8n-obb.pt​
+model = YOLO("yolov8n-obb.pt") ​
+​
+# 配置训练超参数，侧重于金属表面的小目标检测与几何回归​
+train_args = {​
+"data": data_yaml,
+# 数据集配置路径，遵循 DOTA OBB 格式 [class x1 y1 x2 y2 x3 y3 x4
+y4]​
+"epochs": epochs,
+# 迭代周期​
+"imgsz": imgsz,
+# 输入分辨率​
+"batch": 16,
+# 批处理大小​
+"device": device,​
+"optimizer": "AdamW", # 优化器选择​
+"lr0": 0.001,
+# 初始学习率​
+"weight_decay": 0.0005, # 权重衰减以防止过拟合​
+"box": 7.5,
+# 边界框回归损失权重​
+"pose": 1.5,
+# OBB 角度回归损失权重 (DFL + Angle Loss)​
+"half": True,
+# 启用 FP16 混合精度训练​
+"workers": 8,
+# Dataloader 多线程​
+
+"project": "metal_metrology", ​
+"name": "yolo_obb_finetune"​
+}​
+​
+# 启动训练回路​
+print("[*] Starting model training...")​
+results = model.train(**train_args)​
+​
+# 验证阶段​
+print("[*] Evaluating model on validation set...")​
+metrics = model.val()​
+print(f"[*] mAP50-95(OBB): {metrics.box.map:.4f}")​
+​
+# 模型导出管线：将 PyTorch 模型导出为 ONNX 格式，供 C++ 后端调用​
+# 开启 dynamic=True 使得 ONNX 支持动态 Batch Size​
+export_path = model.export(format="onnx", imgsz=imgsz, half=True, dynamic=False,
+opset=12)​
+print(f"[*] Model exported successfully to: {export_path}")​
+​
+if __name__ == "__main__":​
+# 使用预设的 dataset.yaml 启动微调​
+setup_training_pipeline("dataset.yaml", epochs=150)​
+
+Linux C++ 多线程工业视觉处理管线与 ONNXRuntime 集
+成
+在实际的 Linux 工业现场，系统要求处理速度大于相机帧率以避免数据积压。本节设计了基于“多
+生产者-多消费者”模型的无锁化（Lock-free/Mutex-guarded）并发管线 16。
+
+线程安全的图像采集与缓冲机制
+通过 Hikrobot MVS SDK，系统利用驱动级的回调函数拦截底层 V4L2 或 GigE Vision 的内存映射
+指针，实现零拷贝（Zero-copy）获取图像数据 17。
+C++
+
+#include <queue>​
+#include <mutex>​
+#include <condition_variable>​
+#include <opencv2/opencv.hpp>​
+#include <optional>​
+
+​
+// 封装每帧数据的载体​
+struct FrameData {​
+uint64_t frame_id;​
+cv::Mat image;​
+double timestamp;​
+};​
+​
+// 线程安全队列，用于解耦采集线程与推理线程​
+class ThreadSafeQueue {​
+private:​
+std::queue<FrameData> queue_;​
+std::mutex mutex_;​
+std::condition_variable cond_var_;​
+const size_t max_size_ = 30; // 限制积压，防止 OOM 内存溢出​
+​
+public:​
+void push(FrameData data) {​
+std::unique_lock<std::mutex> lock(mutex_);​
+// 如果队列满，则阻塞采集端或实施丢帧策略​
+cond_var_.wait(lock, [this]() { return queue_.size() < max_size_; });​
+queue_.push(std::move(data));​
+lock.unlock();​
+cond_var_.notify_one();​
+}​
+​
+std::optional<FrameData> pop() {​
+std::unique_lock<std::mutex> lock(mutex_);​
+cond_var_.wait(lock, [this]() { return!queue_.empty(); });​
+FrameData data = std::move(queue_.front());​
+queue_.pop();​
+lock.unlock();​
+cond_var_.notify_all(); // 通知生产者队列已释放空间​
+return data;​
+}​
+};​
+
+ONNXRuntime 的 OBB 张量解码与旋转 NMS
+推理线程将 cv::Mat 预处理（Letterbox, Normalize, HWC to CHW）后输入 ONNXRuntime。
+YOLO-OBB 输出的张量维度通常为 [1, num_classes + 5, 8400] 19。我们需要从展平的连续内存块
+中解析出定向边界框的几何信息。
+
+由于模型输出的角度限制在 $[-\pi/2, \pi/2)$ 14，我们需要将其映射到 OpenCV 的 cv::RotatedRect
+体系。OpenCV 中的旋转角度定义因版本而异，但将弧度转为度数并确保宽、高逻辑正确是关
+键。
+
+C++
+
+#include <onnxruntime_cxx_api.h>​
+#include <opencv2/opencv.hpp>​
+​
+struct OBBResult {​
+cv::RotatedRect rrect;​
+int class_id;​
+float confidence;​
+};​
+​
+// 张量解析核心逻辑​
+std::vector<OBBResult> DecodeOBBTensor(float* output_data, int num_proposals, int
+num_classes, float conf_thresh) {​
+std::vector<OBBResult> results;​
+int stride = num_classes + 5; // 假设数据维度已转置为 [8400, classes+5]​
+​
+for (int i = 0; i < num_proposals; ++i) {​
+float* row = output_data + i * stride;​
+​
+// 查找最大类别概率​
+float max_prob = 0.0f;​
+int class_id = -1;​
+for (int c = 0; c < num_classes; ++c) {​
+if (row[5 + c] > max_prob) {​
+max_prob = row[5 + c];​
+class_id = c;​
+}​
+}​
+​
+if (max_prob >= conf_thresh) {​
+float cx = row;​
+float cy = row;​
+float w = row;​
+float h = row;​
+float angle_rad = row; // 弧度范围。传统 NMS 计算轴对齐框的交并比（IoU），而旋转 NMS
+需计算多边形交集面积（Polygon Intersection Area），其时间复杂度显著提高，这要求我们在 C++
+
+中调用经过优化的几何计算库。​
+​
+## 相机几何标定与畸变矫正模型​
+​
+在视觉系统中，像素域的尺寸必须通过相机的内参、外参和畸变系数映射至物理度量域。​
+​
+根据小孔成像理论，三维世界坐标系中的点 $\mathbf{P}_w =^T$ 映射到二维像素平面
+$\mathbf{p}_{uv} = [u, v, 1]^T$ 的齐次关系如下 [21, 22]：​
+​
+$$s \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \mathbf{K} \begin{bmatrix} \mathbf{R} | \mathbf{t}
+\end{bmatrix} \begin{bmatrix} X_w \\ Y_w \\ Z_w \\ 1 \end{bmatrix} = \begin{bmatrix} f_x &
+\gamma & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} r_{11} & r_{12} & r_{13} &
+t_x \\ r_{21} & r_{22} & r_{23} & t_y \\ r_{31} & r_{32} & r_{33} & t_z \end{bmatrix} \begin{bmatrix}
+X_w \\ Y_w \\ Z_w \\ 1 \end{bmatrix}$$​
+​
+由于透镜并非完美模型，会引入非线性几何畸变。本系统采用 Brown-Conrady 模型来修正图像
+的径向与切向畸变 [21]：​
+设 $(x,y)$ 为归一化图像坐标系中的点，径向畸变（Radial Distortion）公式为：​
+$$x_{rad} = x (1 + k_1 r^2 + k_2 r^4 + k_3 r^6)$$​
+$$y_{rad} = y (1 + k_1 r^2 + k_2 r^4 + k_3 r^6)$$​
+其中 $r^2 = x^2 + y^2$。切向畸变（Tangential Distortion）为：​
+$$x_{dist} = x_{rad} + [2p_1 x y + p_2 (r^2 + 2x^2)]$$​
+$$y_{dist} = y_{rad} + [p_1 (r^2 + 2y^2) + 2p_2 x y]$$​
+利用系统预先在 OpenCV 编译生成的张正友标定模块（利用平面棋盘格最小化重投影误差），我
+们可以获取并校正这些误差参数，随后求逆获取单应性矩阵（Homography Matrix），从而将任意
+图像平面的线段直接映射为世界平面（毫米）距离 [23, 24]。​
+​
+## 亚像素卡尺测量的数学理论与实现对比​
+​
+当 YOLO-OBB 定位到测量卡尺或零件的高置信度 ROI 及角度后，像素级（Pixel-level）的边缘提取
+（如 Canny 算子）在亚毫米度量中存在致命缺陷，其量化误差（$\pm 0.5$ 像素）在系统设定下高达
+$\pm 23 \mu m$。为了逼近微米级公差限制，必须实施一维亚像素测径器（1D Measurement
+Caliper）算法 [25, 26, 27]。​
+​
+### 业界标杆：Halcon `gen_measure_rectangle2` 工作原理​
+​
+在工业视觉软件领域，Halcon 凭借其卡尺测量工具链成为绝对的行业标准。其核心流程围绕两个
+算子展开 [25]：​
+1. **对象生成**：`gen_measure_rectangle2(Row, Column, Phi, Length1, Length2, Width, Height,
+Interpolation, MeasureHandle)`。系统根据 OBB 给出的中心和角度（Phi），生成一个长宽为 $2
+\times Length1$ 和 $2 \times Length2$ 的测量矩形句柄。​
+2. **灰度投影与平滑**：算子内部通过双线性（Bilinear）或双三次（Bicubic）插值，沿矩形主轴的垂
+直方向，将像素累加平均，坍缩成一条极低噪声的一维灰度剖面线（Profile）。​
+
+3. **极值定位**：`measure_pos` 在剖面线上应用一阶与二阶微分算子寻找极值点，并通过多项
+式拟合确定亚像素级边缘坐标。​
+​
+### OpenCV C++ 亚像素卡尺自研算法推导​
+​
+由于 Halcon 属闭源商业软件，为了在基于 OpenCV 的系统中实现同等精度的卡尺测量，系统依
+据 Carsten Steger 的一维亚像素边缘定位理论（基于图像函数的微分几何与海森矩阵）进行了纯
+C++ 实现 [28, 29]。​
+​
+**1. 一维灰度剖面映射：**​
+设 OBB 给定的测径器方向单位法向量为 $\mathbf{n} = [\cos\theta, \sin\theta]^T$。以像素中心为
+原点，沿法向构建一维参数化线段，通过插值算法采样灰度值，获得离散的一维信号 $I(x)$。​
+​
+**2. 导数响应与高斯滤波：**​
+为了克服金属加工表面反光引起的极高频噪声，使用尺度为 $\sigma$ 的一阶高斯偏导核 $g'(x,
+\sigma)$ 对信号进行卷积，获取梯度分布：​
+$$R'(x) = I(x) * g'(x, \sigma)$$​
+​
+**3. 抛物线拟合 (Parabolic Interpolation)：**​
+在离散网格中找到 $R'(x)$ 的局部最大值点 $x_0$。此点处满足 $R'(x_0) > R'(x_0-1)$ 且 $R'(x_0) >
+R'(x_0+1)$。真实的亚像素峰值必定落在区间 $(x_0 - 0.5, x_0 + 0.5)$ 之间 [27, 30]。​
+为了求取连续域中的最大值，假设 $x_0$ 附近的一阶梯度响应服从二次抛物线函数：​
+$$y(x) = ax^2 + bx + c$$​
+取相邻的三个采样点：$y_{-1} = R'(x_0 - 1)$, $y_0 = R'(x_0)$, $y_{+1} = R'(x_0 + 1)$。​
+通过解线性方程组求取抛物线顶点，得到极值相对于 $x_0$ 的偏移量 $t$ 为 [28, 31]：​
+$$t = \frac{y_{-1} - y_{+1}}{2(y_{-1} - 2y_0 + y_{+1})}$$​
+由此计算出的绝对亚像素边缘位置为 $x_{sub} = x_0 + t$。​
+​
+当提取出卡尺或零件左右两端的亚像素坐标后，利用前面标定阶段得到的单应性变换矩阵，将其
+转换至物理世界坐标系，两者之间的欧氏距离即为金属零件的高精度物理宽度。​
+​
+## 结语与展望​
+​
+本报告深度剖析并设计了一套运行于 Linux 平台下的金属尺寸测量视觉系统。系统架构以高并发
+多线程 C++ 队列为数据流中枢，无缝整合了 MVS 底层零拷贝采集与 ONNXRuntime 高性能推理
+引擎。通过引入微调后的 YOLO-OBB 定向边界框模型，系统从根本上克服了传统算法在复杂工业
+背景下对旋转目标特征提取的脆弱性；随后，结合严谨的相机畸变数学模型与对标 Halcon 的
+OpenCV 亚像素抛物线拟合卡尺算法，系统成功突破了物理像素网格的精度瓶颈，使得大规模金
+属零件的微米级动态检测成为可能。​
+​
+在系统落地的技术讨论演进至此，提出一个具有前瞻性的学术问题以供进一步探讨：​
+**在当前纯几何解析的亚像素拟合算法（如抛物线插值）中，其鲁棒性高度依赖于高斯平滑尺度
+$\sigma$ 的先验选择；若我们将此一维灰度剖面提取过程映射为深度可分离卷积（Depthwise
+
+Separable Convolution），并利用 Transformer 架构中的自注意力机制来自动学习边缘周边的局
+部高频拓扑特征，这种端到端回归亚像素偏移量的方法，是否能在不损失实时性的前提下，彻底
+取代基于求导的传统卡尺模型，实现对异常反光噪声的几何级免疫？**​
+
+引用的著作
+1.​ MV-CE013-80UM - MaxxVision, 访问时间为 三月 4, 2026，
+
+https://www.maxxvision.com/downloads/Cameras/USB30/Hikrobot/Hikrobot_MVCE013-80UM.pdf
+2.​ MV-CE013-80UM, 访问时间为 三月 4, 2026，
+https://cameralab.ru/upload/iblock/b53/trktxfymch4cgd1y03saa532jp7v4ycb/MVCE013-80UM.pdf
+3.​ MVL-HF0828M-6MPE 6MP FA | Absolute Gauge Technologies™, 访问时间为 三月
+4, 2026， https://absolutegauge.com/product/mvl-hf0828m-6mpe-6mp-fa-lens/
+4.​ MVL-HF0828M-6MPE 1/1.8” 8mm 6MP FA LENS Key Features Order Model
+Specification - MaxxVision, 访问时间为 三月 4, 2026，
+https://www.maxxvision.com/downloads/Objektive/Entozentrisch/Hikrobot/OE_Hi
+krobot_MVL-HF0828M-6MPE.pdf
+5.​ Distortion Relative Illumination MVL-HF0828M-6MPE 1/1.8” 8mm 6MP FA LENS
+Key Features MTF - sp-vt, 访问时间为 三月 4, 2026，
+https://www.sp-vt.com/filesdirectserver/itp1/z_itp_270020250j9c/MVL-HF0828M6MPEdatasheet202208234875z-z812941250877.pdf
+6.​ FA Series Lens - Hikrobot - Machine Vision Products, 访问时间为 三月 4, 2026，
+https://www.hikrobotics.com/en/machinevision/visionproduct/?typeId=40&id=49
+7.​ Pixel Size to Real-World Resolution Converter - Firgelli Automations, 访问时间为
+三月 4, 2026，
+https://www.firgelliauto.com/blogs/engineering-calculators/pixel-size-to-real-worl
+d-resolution-converter
+8.​ Calculating Camera Sensor Resolution and Lens Focal Length - NI, 访问时间为 三
+月 4, 2026，
+https://www.ni.com/en/support/documentation/supplemental/18/calculating-cam
+era-sensor-resolution-and-lens-focal-length.html
+9.​ pySLAM is a hybrid Python/C++ Visual SLAM pipeline supporting monocular,
+stereo, and RGB-D cameras. It provides a broad set of modern local and global
+feature extractors, multiple loop-closure strategies, a volumetric reconstruction
+module, integrated depth-prediction models, and semantic segmentation
+capabilities for enhanced scene understanding. - GitHub, 访问时间为 三月 4,
+2026， https://github.com/luigifreda/pyslam
+10.​MV-CE013-80UM 1.3MP, 1/2.7" CMOS, USB 3.0 Camera, 访问时间为 三月 4, 2026，
+https://effort-group.ru/upload/iblock/b2a/ds0lttwxikxozsu0z7cq0rizhmcwgbky/M
+V_CE013_80UM_en.pdf
+11.​ Oriented Bounding Boxes Object Detection - Ultralytics YOLO Docs, 访问时间为
+三月 4, 2026， https://docs.ultralytics.com/tasks/obb/
+12.​YoloV8 OBB Output Format · Issue #9120 - GitHub, 访问时间为 三月 4, 2026，
+https://github.com/ultralytics/ultralytics/issues/9120
+
+13.​The Architecture and Performance of WMPI II, 访问时间为 三月 4, 2026，
+
+https://home.iscte-iul.pt/~alcen/pubs/alchristensen_wmpi2_europvmmpi2004.pdf
+14.​Building a High-Performance Real-Time Camera Capture System in C++ - DEV
+Community, 访问时间为 三月 4, 2026，
+https://dev.to/techsorter/building-a-high-performance-real-time-camera-captur
+e-system-in-c-3kad
+15.​Machine Vision - Service - Download Center - Hikrobot, 访问时间为 三月 4, 2026，
+https://www.hikrobotics.com/en/machinevision/service/download/
+16.​yolov8 obb onnx cpp demo · Issue #7667 - GitHub, 访问时间为 三月 4, 2026，
+https://github.com/ultralytics/ultralytics/issues/7667
+
+
