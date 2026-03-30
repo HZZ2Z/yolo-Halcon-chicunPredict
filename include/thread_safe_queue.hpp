@@ -8,10 +8,26 @@
 template <typename T>
 class ThreadSafeQueue {
 public:
-    explicit ThreadSafeQueue(size_t max_size = 30) : max_size_(max_size) {}
+    explicit ThreadSafeQueue(size_t max_size = 30, bool drop_oldest_when_full = false)
+        : max_size_(max_size > 0 ? max_size : 1),
+          drop_oldest_when_full_(drop_oldest_when_full) {}
 
     void push(T data) {
         std::unique_lock<std::mutex> lock(mutex_);
+        if (closed_) {
+            return;
+        }
+
+        if (drop_oldest_when_full_) {
+            if (queue_.size() >= max_size_) {
+                queue_.pop();
+            }
+            queue_.push(std::move(data));
+            lock.unlock();
+            cv_not_empty_.notify_one();
+            return;
+        }
+
         cv_not_full_.wait(lock, [this]() { return closed_ || queue_.size() < max_size_; });
         if (closed_) {
             return;
@@ -47,5 +63,6 @@ private:
     std::condition_variable cv_not_empty_;
     std::condition_variable cv_not_full_;
     size_t max_size_;
+    bool drop_oldest_when_full_ = false;
     bool closed_ = false;
 };

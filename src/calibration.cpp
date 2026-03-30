@@ -1,9 +1,10 @@
 #include "calibration.hpp"
 
+#include "logger.hpp"
+
 #include <cmath>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <limits>
 #include <string>
 
@@ -107,10 +108,10 @@ bool CalibrationMapper::loadFromDirectory(const std::string& dir_path) {
     }
 
     if (campar.empty() || pose.empty()) {
-        std::cerr << "[HALCON] 未找到成对标定文件: dir=" << dir_path << std::endl;
+        logger::Error(std::string("[HALCON] 未找到成对标定文件: dir=") + dir_path);
         return false;
     }
-    std::cerr << "[HALCON] 使用标定文件: campar=" << campar.string() << ", pose=" << pose.string() << std::endl;
+    logger::Info(std::string("[HALCON] 使用标定文件: campar=") + campar.string() + ", pose=" + pose.string());
     return loadFromFiles(campar.string(), pose.string());
 }
 
@@ -122,8 +123,8 @@ bool CalibrationMapper::loadFromFiles(const std::string& campar_path, const std:
         ready_ = true;
         return true;
     } catch (const HalconCpp::HException& e) {
-        std::cerr << "[HALCON] 读取标定失败: campar=" << campar_path << ", pose=" << pose_path << std::endl;
-        std::cerr << "[HALCON] 异常: " << e.ErrorMessage() << std::endl;
+        logger::Error(std::string("[HALCON] 读取标定失败: campar=") + campar_path + ", pose=" + pose_path);
+        logger::Error(std::string("[HALCON] 异常: ") + e.ErrorMessage().Text());
         ready_ = false;
         projection_valid_ = false;
         return false;
@@ -153,7 +154,7 @@ bool CalibrationMapper::validateProjection(int image_width, int image_height) {
         HalconCpp::ImagePointsToWorldPlane(cam_param_, world_pose_, cy, cx + 100.0, "mm", &x1, &y1);
 
         if (x0.Length() <= 0 || y0.Length() <= 0 || x1.Length() <= 0 || y1.Length() <= 0) {
-            std::cerr << "[HALCON] 投影校验失败: 返回长度为空" << std::endl;
+            logger::Error("[HALCON] 投影校验失败: 返回长度为空");
             return false;
         }
 
@@ -161,13 +162,13 @@ bool CalibrationMapper::validateProjection(int image_width, int image_height) {
         const double dy = y1[0].D() - y0[0].D();
         const double dist = std::sqrt(dx * dx + dy * dy);
         if (!std::isfinite(dist) || dist <= 1e-6) {
-            std::cerr << "[HALCON] 投影校验失败: dist=" << dist << std::endl;
+            logger::Error(std::string("[HALCON] 投影校验失败: dist=") + std::to_string(dist));
             return false;
         }
-        std::cerr << "[HALCON] 投影校验通过: 100px -> " << dist << " mm" << std::endl;
+        logger::Info(std::string("[HALCON] 投影校验通过: 100px -> ") + std::to_string(dist) + " mm");
         return true;
     } catch (const HalconCpp::HException& e) {
-        std::cerr << "[HALCON] 投影校验异常: " << e.ErrorMessage() << std::endl;
+        logger::Error(std::string("[HALCON] 投影校验异常: ") + e.ErrorMessage().Text());
         return false;
     }
 #else

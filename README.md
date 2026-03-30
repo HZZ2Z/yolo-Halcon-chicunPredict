@@ -8,6 +8,22 @@
 - 推理/测量/渲染分频执行（可配置）
 - 轻量化主流程与实时尺寸显示（无磁盘写盘）
 
+## 开发者入口
+
+- 架构说明：`docs/architecture.md`
+- 开发导引：`docs/development.md`
+- 单元测试：`tests/`
+
+快速执行单元测试：
+
+```bash
+cmake -S . -B build_test \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DUSE_MVS=OFF -DUSE_HALCON=OFF -DUSE_ONNXRUNTIME=OFF
+cmake --build build_test -j
+ctest --test-dir build_test --output-on-failure
+```
+
 ---
 
 ## 1. 系统架构
@@ -26,8 +42,18 @@
   - 基于 OBB 主轴方向构建 1D profile，做亚像素边缘定位
 - 标定层：`src/calibration.cpp`
   - 畸变矫正 + 单应性像素到毫米映射
-- 调度层：`src/main.cpp`
-  - 生产者/消费者并发队列、分频调度与实时可视化
+- 应用层：`src/app/pipeline_runner.cpp`
+  - 生产者/消费者并发队列与线程调度壳层
+- 初始化层：`src/app/pipeline_init.cpp`
+  - 采集、标定、推理、测量组件初始化与前置校验
+- 帧处理层：`src/app/frame_processor.cpp`
+  - 单帧去畸变、推理、跟踪、测量、平滑与渲染触发
+- 可视化层：`src/app/frame_visualizer.cpp`
+  - 统一绘制 OBB/测量结果与键盘退出处理
+- 日志层：`src/logger.cpp`
+  - 统一 Info/Warn/Error 输出与诊断日志开关（入口、应用、ONNX、HALCON 模块已接入）
+- 入口层：`src/main.cpp`
+  - 仅负责参数读取、配置加载与异常处理
 
 ### 1.2 数据流
 1. 采集线程读取图像并入队
@@ -141,6 +167,16 @@ cmake --build build -j
 ./build/metal_metrology config/system.yaml
 ```
 
+或使用脚本：
+
+```bash
+bash scripts/run_demo.sh
+```
+
+提示：请直接复制代码块中的纯命令，不要输入成 `bash [run_demo.sh](...)` 这种 Markdown 链接形式。
+
+说明：快速模式会跳过编译；若当前二进制不是以 `USE_ONNXRUNTIME=ON` 构建，程序会在 ONNX 初始化阶段退出，请使用 `--rebuild`。
+
 ### 5.3 运行配置说明
 - `input_source: "mvs:0"`：MVS 第 0 台相机
 - `input_source: "0"`：UVC 摄像头
@@ -173,7 +209,7 @@ cmake --build build -j
 - 窗口显示稳定 OBB、左右边缘点、像素尺寸与毫米尺寸
 - 未提供标定时，毫米显示为 `mm=N/A`
 
-如需重新启用 CSV 记录，可在主流程中恢复写盘分支（`src/main.cpp`）。
+如需重新启用 CSV 记录，建议在 `src/app/frame_processor.cpp` 中按测量结果分支扩展写盘逻辑。
 
 ---
 
@@ -198,8 +234,14 @@ cmake --build build -j
 
 ## 9. 代码入口索引
 
-- 主流程：`src/main.cpp`
+- 主流程编排：`src/app/pipeline_runner.cpp`
+- 初始化与预检：`src/app/pipeline_init.cpp`
+- 单帧处理：`src/app/frame_processor.cpp`
+- 可视化：`src/app/frame_visualizer.cpp`
+- 日志：`src/logger.cpp`
+- 程序入口：`src/main.cpp`
 - 配置加载：`src/config.cpp`
+- 日志门面：`src/logger.cpp`
 - 采集：`src/camera_provider.cpp`
 - 推理与 NMS：`src/onnx_inferencer.cpp`
 - 跟踪：`src/tracker_ekf.cpp`

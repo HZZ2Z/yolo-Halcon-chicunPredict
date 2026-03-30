@@ -1,10 +1,11 @@
 #include "onnx_inferencer.hpp"
 
+#include "logger.hpp"
+
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstring>
-#include <iostream>
 
 #ifdef USE_ONNXRUNTIME
 #include <onnxruntime_cxx_api.h>
@@ -16,7 +17,7 @@ OnnxObbInferencer::OnnxObbInferencer(const std::string& model_path, float conf_t
 bool OnnxObbInferencer::init() {
 #ifdef USE_ONNXRUNTIME
     if (model_path_.empty()) {
-        std::cerr << "[ONNX] 模型路径为空" << std::endl;
+        logger::Error("[ONNX] 模型路径为空");
         return false;
     }
     try {
@@ -31,10 +32,10 @@ bool OnnxObbInferencer::init() {
         cuda_options.do_copy_in_default_stream = 1;
         try {
             options.AppendExecutionProvider_CUDA(cuda_options);
-            std::cout << "[ONNX] CUDA Execution Provider 已启用" << std::endl;
+            logger::Info("[ONNX] CUDA Execution Provider 已启用");
         } catch (const Ort::Exception& e) {
-            std::cerr << "[ONNX] CUDA Execution Provider 启用失败: " << e.what() << std::endl;
-            std::cerr << "[ONNX] 当前配置要求 GPU 推理，程序退出。" << std::endl;
+            logger::Error(std::string("[ONNX] CUDA Execution Provider 启用失败: ") + e.what());
+            logger::Error("[ONNX] 当前配置要求 GPU 推理，程序退出。");
             delete env;
             return false;
         }
@@ -51,13 +52,13 @@ bool OnnxObbInferencer::init() {
         session_ = session;
         return true;
     } catch (const Ort::Exception& e) {
-        std::cerr << "[ONNX] 初始化异常: " << e.what() << std::endl;
+        logger::Error(std::string("[ONNX] 初始化异常: ") + e.what());
         return false;
     } catch (const std::exception& e) {
-        std::cerr << "[ONNX] 初始化异常: " << e.what() << std::endl;
+        logger::Error(std::string("[ONNX] 初始化异常: ") + e.what());
         return false;
     } catch (...) {
-        std::cerr << "[ONNX] 初始化异常: unknown error" << std::endl;
+        logger::Error("[ONNX] 初始化异常: unknown error");
         return false;
     }
 #else
@@ -123,13 +124,13 @@ std::vector<OBBResult> OnnxObbInferencer::infer(const cv::Mat& image) {
 
         return rotatedNms(decodeOrtOutputs(image, out_ptr, shape));
     } catch (const Ort::Exception& e) {
-        std::cerr << "[ONNX-infer] runtime exception: " << e.what() << std::endl;
+        logger::Error(std::string("[ONNX-infer] runtime exception: ") + e.what());
         return {};
     } catch (const std::exception& e) {
-        std::cerr << "[ONNX-infer] runtime exception: " << e.what() << std::endl;
+        logger::Error(std::string("[ONNX-infer] runtime exception: ") + e.what());
         return {};
     } catch (...) {
-        std::cerr << "[ONNX-infer] runtime exception: unknown" << std::endl;
+        logger::Error("[ONNX-infer] runtime exception: unknown");
         return {};
     }
 #else

@@ -13,6 +13,31 @@ void readIfExists(const cv::FileNode& node, const char* key, T& value) {
     }
 }
 
+void requireRange(bool condition, const std::string& message) {
+    if (!condition) {
+        throw std::runtime_error("配置非法: " + message);
+    }
+}
+
+void validateConfig(const AppConfig& config) {
+    requireRange(config.frame_width > 0, "frame_width 必须 > 0");
+    requireRange(config.frame_height > 0, "frame_height 必须 > 0");
+    requireRange(config.queue_size > 0, "queue_size 必须 > 0");
+    requireRange(config.infer_interval > 0, "infer_interval 必须 > 0");
+    requireRange(config.measure_interval > 0, "measure_interval 必须 > 0");
+    requireRange(config.render_interval > 0, "render_interval 必须 > 0");
+
+    requireRange(config.conf_threshold > 0.0f && config.conf_threshold <= 1.0f,
+                 "conf_threshold 必须在 (0, 1] 区间");
+    requireRange(config.nms_threshold > 0.0f && config.nms_threshold <= 1.0f,
+                 "nms_threshold 必须在 (0, 1] 区间");
+
+    requireRange(config.caliper_length > 0.0f, "caliper_length 必须 > 0");
+    requireRange(config.caliper_half_width > 0.0f, "caliper_half_width 必须 > 0");
+    requireRange(config.gaussian_sigma > 0.0f, "gaussian_sigma 必须 > 0");
+    requireRange(config.caliper_search_scale > 0.0f, "caliper_search_scale 必须 > 0");
+}
+
 } // namespace
 
 AppConfig LoadConfig(const std::string& yaml_path) {
@@ -73,6 +98,8 @@ AppConfig LoadConfig(const std::string& yaml_path) {
     int strict_calibration = config.strict_calibration ? 1 : 0;
     readIfExists(root, "strict_calibration", strict_calibration);
     config.strict_calibration = strict_calibration != 0;
+
+    validateConfig(config);
 
     const std::filesystem::path base_dir = std::filesystem::absolute(std::filesystem::path(yaml_path)).parent_path();
     auto resolvePath = [&](std::string& value) {

@@ -34,9 +34,19 @@ endif()
 
 find_package(OpenCV REQUIRED)
 
-add_executable(metal_metrology
-    src/main.cpp
+add_library(metal_foundation STATIC
     src/config.cpp
+    src/logger.cpp
+)
+
+target_include_directories(metal_foundation PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${OpenCV_INCLUDE_DIRS}
+)
+
+target_link_libraries(metal_foundation PUBLIC ${OpenCV_LIBS})
+
+add_library(metal_core STATIC
     src/camera_provider.cpp
     src/onnx_inferencer.cpp
     src/tracker_ekf.cpp
@@ -44,15 +54,45 @@ add_executable(metal_metrology
     src/subpixel_caliper.cpp
 )
 
-target_include_directories(metal_metrology PRIVATE
+target_include_directories(metal_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${OpenCV_INCLUDE_DIRS}
 )
 
-target_link_libraries(metal_metrology PRIVATE ${OpenCV_LIBS})
+target_link_libraries(metal_core PUBLIC metal_foundation)
+
+add_library(metal_app STATIC
+    src/app/pipeline_context.cpp
+    src/app/pipeline_runner.cpp
+    src/app/pipeline_init.cpp
+    src/app/frame_processor.cpp
+    src/app/frame_visualizer.cpp
+)
+
+target_link_libraries(metal_app PUBLIC metal_core)
+
+add_executable(metal_metrology
+    src/main.cpp
+)
+
+target_link_libraries(metal_metrology PRIVATE metal_app)
+
+include(CTest)
+
+if(BUILD_TESTING)
+    add_executable(metal_unit_tests
+        tests/test_main.cpp
+        tests/test_config.cpp
+        tests/test_thread_safe_queue.cpp
+    )
+    target_link_libraries(metal_unit_tests PRIVATE metal_foundation)
+    add_test(NAME metal_unit_tests COMMAND metal_unit_tests)
+endif()
+
+set(_runtime_rpaths "")
 
 if(USE_HALCON)
-    target_compile_definitions(metal_metrology PRIVATE USE_HALCON=1)
+    target_compile_definitions(metal_core PRIVATE USE_HALCON=1)
 
     if(NOT DEFINED HALCON_ROOT)
         set(_halcon_roots
@@ -86,10 +126,10 @@ if(USE_HALCON)
         message(FATAL_ERROR "未找到 HALCON 库目录: ${HALCON_LIB_DIR}，请检查 HALCON_ARCH")
     endif()
 
-    target_include_directories(metal_metrology PRIVATE "${HALCON_ROOT}/include")
-    target_link_directories(metal_metrology PRIVATE "${HALCON_LIB_DIR}")
-    target_link_libraries(metal_metrology PRIVATE halconcpp halcon)
-    set_target_properties(metal_metrology PROPERTIES BUILD_RPATH "${HALCON_LIB_DIR}")
+    target_include_directories(metal_core PRIVATE "${HALCON_ROOT}/include")
+    target_link_directories(metal_core PRIVATE "${HALCON_LIB_DIR}")
+    target_link_libraries(metal_core PRIVATE halconcpp halcon)
+    list(APPEND _runtime_rpaths "${HALCON_LIB_DIR}")
 endif()
 
 if(USE_MVS)
@@ -101,15 +141,15 @@ if(USE_MVS)
         message(FATAL_ERROR "USE_MVS=ON 但未找到 ${MVS_DIR}/include/MvCameraControl.h，请设置 -DMVS_DIR=/opt/MVS")
     endif()
 
-    target_compile_definitions(metal_metrology PRIVATE USE_MVS=1)
-    target_include_directories(metal_metrology PRIVATE ${MVS_DIR}/include)
-    target_link_directories(metal_metrology PRIVATE ${MVS_DIR}/lib/64)
-    target_link_libraries(metal_metrology PRIVATE MvCameraControl pthread)
-    set_target_properties(metal_metrology PROPERTIES BUILD_RPATH "${MVS_DIR}/lib/64")
+    target_compile_definitions(metal_core PRIVATE USE_MVS=1)
+    target_include_directories(metal_core PRIVATE ${MVS_DIR}/include)
+    target_link_directories(metal_core PRIVATE ${MVS_DIR}/lib/64)
+    target_link_libraries(metal_core PRIVATE MvCameraControl pthread)
+    list(APPEND _runtime_rpaths "${MVS_DIR}/lib/64")
 endif()
 
 if(USE_ONNXRUNTIME)
-    target_compile_definitions(metal_metrology PRIVATE USE_ONNXRUNTIME=1)
+    target_compile_definitions(metal_core PRIVATE USE_ONNXRUNTIME=1)
 
     if(NOT ONNXRUNTIME_INCLUDE_DIR)
         set(_ort_include_candidates
@@ -148,7 +188,7 @@ if(USE_ONNXRUNTIME)
         message(FATAL_ERROR "未找到 ONNX Runtime 库目录，请设置 -DONNXRUNTIME_LIB_DIR=/path/to/lib")
     endif()
 
-    target_include_directories(metal_metrology PRIVATE
+    target_include_directories(metal_core PRIVATE
         ${ONNXRUNTIME_INCLUDE_DIR}
         ${ONNXRUNTIME_INCLUDE_DIR}/onnxruntime/core/session
     )
@@ -156,8 +196,13 @@ if(USE_ONNXRUNTIME)
     if(NOT ONNXRUNTIME_LIB)
         message(FATAL_ERROR "未在 ${ONNXRUNTIME_LIB_DIR} 找到 libonnxruntime.so")
     endif()
-    target_link_libraries(metal_metrology PRIVATE ${ONNXRUNTIME_LIB})
-    set_target_properties(metal_metrology PROPERTIES BUILD_RPATH "${MVS_DIR}/lib/64;${ONNXRUNTIME_LIB_DIR}")
+    target_link_libraries(metal_core PRIVATE ${ONNXRUNTIME_LIB})
+    list(APPEND _runtime_rpaths "${ONNXRUNTIME_LIB_DIR}")
+endif()
+
+if(_runtime_rpaths)
+    list(REMOVE_DUPLICATES _runtime_rpaths)
+    set_target_properties(metal_metrology PROPERTIES BUILD_RPATH "${_runtime_rpaths}")
 endif()
 
 install(TARGETS metal_metrology RUNTIME DESTINATION bin)
