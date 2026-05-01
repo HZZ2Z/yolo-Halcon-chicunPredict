@@ -25,11 +25,11 @@
 - 帧处理层
   - `src/app/frame_processor.cpp`
   - 职责：
-    - 单帧去畸变
+    - 保持原图坐标系进行单帧处理
     - 按分频执行推理
     - 跟踪融合
     - 按分频执行测量
-    - 毫米换算与中值平滑
+    - HALCON 点级世界映射、误差传播与中值平滑
     - 按分频触发可视化
 
 - 可视化层
@@ -38,7 +38,7 @@
 
 - 日志层
   - `src/logger.cpp`
-  - 职责：统一 Info/Warn/Error 输出入口，支持诊断日志开关。
+  - 职责：统一 Info/Warn/Error 输出入口。
   - 现状：入口层、应用层、以及 `onnx_inferencer/calibration` 领域模块均已接入该门面。
 
 - 领域能力层（原有模块）
@@ -47,6 +47,7 @@
   - 跟踪：`src/tracker_ekf.cpp`
   - 标定：`src/calibration.cpp`
   - 测量：`src/subpixel_caliper.cpp`
+  - 误差传播：`src/measurement_uncertainty.cpp`
   - 配置：`src/config.cpp`
 
 ## 依赖方向（约束）
@@ -72,10 +73,10 @@
 - 队列长度与背压策略
 - 推理/测量/渲染分频逻辑
 - 中值平滑窗口（5）
-- 标定毫米换算路径
+- 标定毫米换算路径仍沿用 HALCON `pixelToWorld()`，不切换检测坐标系
 
-## 后续演进建议
+## 生产交付说明
 
-- 若后续需要单元测试，可优先为 `frame_processor` 增加无 UI 的处理测试入口。
+- 当前交付版不包含单元测试目标和开发构建产物。
 - 若需要多工位扩展，可在应用编排层引入多 pipeline 实例管理，不下沉到领域层。
 - 若需要更细粒度日志，可在 `logger` 中增加模块标签与日志级别过滤（保持零业务侵入）。

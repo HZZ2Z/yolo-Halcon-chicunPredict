@@ -11,14 +11,6 @@
 #include <memory>
 
 bool InitializePipeline(const AppConfig& cfg, PipelineContext& context) {
-    context.camera = std::make_unique<CameraProvider>(cfg.input_source, cfg.frame_width, cfg.frame_height);
-    if (!context.camera->open()) {
-        logger::Error(std::string("相机/视频源打开失败: ") + cfg.input_source);
-        logger::Warn("提示: 若系统无 /dev/video*，说明设备可能不是 UVC 直出。");
-        logger::Warn("请先运行 scripts/check_camera.sh 诊断；若为 Hikrobot 工业相机，建议接入 MVS SDK 采集。");
-        return false;
-    }
-
     context.calibration = std::make_unique<CalibrationMapper>();
     const bool calibration_loaded =
         (!cfg.calibration_file.empty() &&
@@ -36,6 +28,14 @@ bool InitializePipeline(const AppConfig& cfg, PipelineContext& context) {
         return false;
     }
 
+    context.camera = std::make_unique<CameraProvider>(cfg.input_source, cfg.frame_width, cfg.frame_height);
+    if (!context.camera->open()) {
+        logger::Error(std::string("相机/视频源打开失败: ") + cfg.input_source);
+        logger::Warn("提示: 若系统无 /dev/video*，说明设备可能不是 UVC 直出。");
+        logger::Warn("请先运行 scripts/check_camera.sh 诊断；若为 Hikrobot 工业相机，建议接入 MVS SDK 采集。");
+        return false;
+    }
+
     context.inferencer = std::make_unique<OnnxObbInferencer>(
         cfg.onnx_model_path, cfg.conf_threshold, cfg.nms_threshold);
     if (!context.inferencer->init()) {
@@ -48,7 +48,10 @@ bool InitializePipeline(const AppConfig& cfg, PipelineContext& context) {
                                                         cfg.gaussian_sigma,
                                                         cfg.caliper_search_scale,
                                                         cfg.use_obb_adaptive_caliper,
-                                                        cfg.measure_long_edge);
+                                                        cfg.measure_long_edge,
+                                                        cfg.multi_scan_count,
+                                                        cfg.edge_refine_half_window,
+                                                        cfg.edge_power_gamma);
     context.tracker = std::make_unique<ObbTracker>();
     context.visualizer = std::make_unique<FrameVisualizer>();
 

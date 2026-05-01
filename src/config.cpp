@@ -1,5 +1,6 @@
 #include "config.hpp"
 
+#include <cmath>
 #include <filesystem>
 #include <opencv2/opencv.hpp>
 #include <stdexcept>
@@ -32,10 +33,20 @@ void validateConfig(const AppConfig& config) {
     requireRange(config.nms_threshold > 0.0f && config.nms_threshold <= 1.0f,
                  "nms_threshold 必须在 (0, 1] 区间");
 
-    requireRange(config.caliper_length > 0.0f, "caliper_length 必须 > 0");
+    if (config.use_obb_adaptive_caliper) {
+        requireRange(std::isfinite(config.caliper_length),
+                     "caliper_length 必须为有限数值");
+    } else {
+        requireRange(config.caliper_length > 0.0f,
+                     "caliper_length 必须 > 0，或启用 use_obb_adaptive_caliper");
+    }
     requireRange(config.caliper_half_width > 0.0f, "caliper_half_width 必须 > 0");
     requireRange(config.gaussian_sigma > 0.0f, "gaussian_sigma 必须 > 0");
     requireRange(config.caliper_search_scale > 0.0f, "caliper_search_scale 必须 > 0");
+    requireRange(config.multi_scan_count > 0, "multi_scan_count 必须 > 0");
+    requireRange(config.edge_refine_half_window > 0, "edge_refine_half_window 必须 > 0");
+    requireRange(config.edge_power_gamma > 0.0f, "edge_power_gamma 必须 > 0");
+    requireRange(config.huber_delta_mm > 0.0f, "huber_delta_mm 必须 > 0");
 }
 
 } // namespace
@@ -87,13 +98,18 @@ AppConfig LoadConfig(const std::string& yaml_path) {
     readIfExists(root, "measure_long_edge", measure_long_edge);
     config.measure_long_edge = measure_long_edge != 0;
 
+    readIfExists(root, "multi_scan_count", config.multi_scan_count);
+    readIfExists(root, "edge_refine_half_window", config.edge_refine_half_window);
+    readIfExists(root, "edge_power_gamma", config.edge_power_gamma);
+    readIfExists(root, "huber_delta_mm", config.huber_delta_mm);
+
+    int estimate_measurement_uncertainty = config.estimate_measurement_uncertainty ? 1 : 0;
+    readIfExists(root, "estimate_measurement_uncertainty", estimate_measurement_uncertainty);
+    config.estimate_measurement_uncertainty = estimate_measurement_uncertainty != 0;
+
     int show_window = config.show_window ? 1 : 0;
     readIfExists(root, "show_window", show_window);
     config.show_window = show_window != 0;
-
-    int enable_diag_logs = config.enable_diag_logs ? 1 : 0;
-    readIfExists(root, "enable_diag_logs", enable_diag_logs);
-    config.enable_diag_logs = enable_diag_logs != 0;
 
     int strict_calibration = config.strict_calibration ? 1 : 0;
     readIfExists(root, "strict_calibration", strict_calibration);

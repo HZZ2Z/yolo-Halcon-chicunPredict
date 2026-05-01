@@ -19,6 +19,12 @@ bool FrameVisualizer::render(const AppConfig& cfg,
     }
 
     if (last_measurement.valid) {
+        for (size_t i = 0; i < last_measurement.left_edge_samples_px.size(); ++i) {
+            cv::circle(image, last_measurement.left_edge_samples_px[i], 2, cv::Scalar(180, 80, 0), -1);
+            if (i < last_measurement.right_edge_samples_px.size()) {
+                cv::circle(image, last_measurement.right_edge_samples_px[i], 2, cv::Scalar(0, 80, 180), -1);
+            }
+        }
         cv::circle(image, last_measurement.left_edge_px, 3, cv::Scalar(255, 0, 0), -1);
         cv::circle(image, last_measurement.right_edge_px, 3, cv::Scalar(0, 0, 255), -1);
     }
@@ -31,6 +37,13 @@ bool FrameVisualizer::render(const AppConfig& cfg,
                                                         : "mm=N/A (need calibration)";
     cv::putText(image, mm_text, cv::Point(20, 75), cv::FONT_HERSHEY_SIMPLEX, 0.8,
                 cv::Scalar(255, 255, 0), 2);
+
+    if (last_measurement.valid && last_measurement.world_sigma_mm >= 0.0f) {
+        const std::string sigma_text = "sigma=" + std::to_string(last_measurement.world_sigma_mm) +
+                                       " scans=" + std::to_string(last_measurement.valid_scan_count);
+        cv::putText(image, sigma_text, cv::Point(20, 110), cv::FONT_HERSHEY_SIMPLEX, 0.8,
+                    cv::Scalar(255, 200, 0), 2);
+    }
 
     cv::imshow("metal_metrology", image);
     int key = cv::waitKey(1);

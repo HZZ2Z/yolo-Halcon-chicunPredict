@@ -20,8 +20,7 @@ CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/ar
 
-//Choose the type of build, options are: None Debug Release RelWithDebInfo
-// MinSizeRel ...
+//Build type
 CMAKE_BUILD_TYPE:STRING=Release
 
 //Enable/Disable color output during build.
@@ -334,26 +333,20 @@ CUDA_nvToolsExt_LIBRARY:FILEPATH=/usr/local/cuda-12.1/lib64/libnvToolsExt.so
 //Path to a library.
 CUDA_rt_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/librt.a
 
-//No help, variable specified on the command line.
-HALCON_ARCH:UNINITIALIZED=x64-linux
+//HALCON architecture
+HALCON_ARCH:STRING=x64-linux
 
-//No help, variable specified on the command line.
-HALCON_ROOT:UNINITIALIZED=/home/hzwang/MVTec/HALCON-25.11-Progress
+//HALCON installation root
+HALCON_ROOT:PATH=/home/hzwang/MVTec/HALCON-25.11-Progress
 
-//No help, variable specified on the command line.
-MVS_DIR:UNINITIALIZED=/opt/MVS
-
-//No help, variable specified on the command line.
-ONNXRUNTIME_DIR:UNINITIALIZED=你的onnxruntime目录
-
-//No help, variable specified on the command line.
-ONNXRUNTIME_INCLUDE_DIR:UNINITIALIZED=/home/hzwang/onnxruntime/include
+//ONNX Runtime include directory
+ONNXRUNTIME_INCLUDE_DIR:PATH=/home/hzwang/onnxruntime/include
 
 //Path to a library.
 ONNXRUNTIME_LIB:FILEPATH=/home/hzwang/onnxruntime/build/Linux/Release/libonnxruntime.so
 
-//No help, variable specified on the command line.
-ONNXRUNTIME_LIB_DIR:UNINITIALIZED=/home/hzwang/onnxruntime/build/Linux/Release
+//ONNX Runtime library directory
+ONNXRUNTIME_LIB_DIR:PATH=/home/hzwang/onnxruntime/build/Linux/Release
 
 //No help, variable specified on the command line.
 OpenCV_DIR:UNINITIALIZED=/home/hzwang/projects/opencv_build/opencv-4.9.0/build

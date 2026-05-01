@@ -20,6 +20,19 @@ void ObbTracker::reset() {
     initialized_ = false;
 }
 
+cv::Matx33f ObbTracker::poseCovariance() const {
+    cv::Matx33f cov = cv::Matx33f::eye();
+    if (kf_.errorCovPost.empty() || kf_.errorCovPost.rows < 3 || kf_.errorCovPost.cols < 3) {
+        return cov;
+    }
+    for (int r = 0; r < 3; ++r) {
+        for (int c = 0; c < 3; ++c) {
+            cov(r, c) = kf_.errorCovPost.at<float>(r, c);
+        }
+    }
+    return cov;
+}
+
 OBBResult ObbTracker::update(const std::optional<OBBResult>& obs) {
     OBBResult result;
 

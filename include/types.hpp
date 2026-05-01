@@ -20,9 +20,18 @@ struct MeasurementResult {
     uint64_t frame_id = 0;
     bool valid = false;
     float pixel_distance = 0.0f;
-    float world_distance_mm = 0.0f;
+    float world_distance_mm = -1.0f;
+    float raw_world_distance_mm = -1.0f;
+    float world_sigma_mm = -1.0f;
     cv::Point2f left_edge_px;
     cv::Point2f right_edge_px;
+    cv::Matx22f left_edge_cov_px = cv::Matx22f::zeros();
+    cv::Matx22f right_edge_cov_px = cv::Matx22f::zeros();
+    int valid_scan_count = 0;
+    std::vector<cv::Point2f> left_edge_samples_px;
+    std::vector<cv::Point2f> right_edge_samples_px;
+    std::vector<cv::Matx22f> left_edge_sample_covs_px;
+    std::vector<cv::Matx22f> right_edge_sample_covs_px;
 };
 
 inline float deg2rad(float deg) {

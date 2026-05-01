@@ -28,9 +28,13 @@ struct AppConfig {
     float caliper_search_scale = 1.25f;
     bool use_obb_adaptive_caliper = true;
     bool measure_long_edge = true;
+    int multi_scan_count = 7;
+    int edge_refine_half_window = 4;
+    float edge_power_gamma = 2.0f;
+    float huber_delta_mm = 0.05f;
+    bool estimate_measurement_uncertainty = true;
 
     bool show_window = true;
-    bool enable_diag_logs = false;
     bool strict_calibration = true;
 };
 

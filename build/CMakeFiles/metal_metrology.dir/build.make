@@ -83,111 +83,19 @@ CMakeFiles/metal_metrology.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/metal_metrology.dir/src/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hzwang/桌面/Hik_yoloobb/src/main.cpp -o CMakeFiles/metal_metrology.dir/src/main.cpp.s
 
-CMakeFiles/metal_metrology.dir/src/config.cpp.o: CMakeFiles/metal_metrology.dir/flags.make
-CMakeFiles/metal_metrology.dir/src/config.cpp.o: /home/hzwang/桌面/Hik_yoloobb/src/config.cpp
-CMakeFiles/metal_metrology.dir/src/config.cpp.o: CMakeFiles/metal_metrology.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/metal_metrology.dir/src/config.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/metal_metrology.dir/src/config.cpp.o -MF CMakeFiles/metal_metrology.dir/src/config.cpp.o.d -o CMakeFiles/metal_metrology.dir/src/config.cpp.o -c /home/hzwang/桌面/Hik_yoloobb/src/config.cpp
-
-CMakeFiles/metal_metrology.dir/src/config.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/metal_metrology.dir/src/config.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hzwang/桌面/Hik_yoloobb/src/config.cpp > CMakeFiles/metal_metrology.dir/src/config.cpp.i
-
-CMakeFiles/metal_metrology.dir/src/config.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/metal_metrology.dir/src/config.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hzwang/桌面/Hik_yoloobb/src/config.cpp -o CMakeFiles/metal_metrology.dir/src/config.cpp.s
-
-CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o: CMakeFiles/metal_metrology.dir/flags.make
-CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o: /home/hzwang/桌面/Hik_yoloobb/src/camera_provider.cpp
-CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o: CMakeFiles/metal_metrology.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o -MF CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o.d -o CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o -c /home/hzwang/桌面/Hik_yoloobb/src/camera_provider.cpp
-
-CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hzwang/桌面/Hik_yoloobb/src/camera_provider.cpp > CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.i
-
-CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hzwang/桌面/Hik_yoloobb/src/camera_provider.cpp -o CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.s
-
-CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o: CMakeFiles/metal_metrology.dir/flags.make
-CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o: /home/hzwang/桌面/Hik_yoloobb/src/onnx_inferencer.cpp
-CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o: CMakeFiles/metal_metrology.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o -MF CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o.d -o CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o -c /home/hzwang/桌面/Hik_yoloobb/src/onnx_inferencer.cpp
-
-CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hzwang/桌面/Hik_yoloobb/src/onnx_inferencer.cpp > CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.i
-
-CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hzwang/桌面/Hik_yoloobb/src/onnx_inferencer.cpp -o CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.s
-
-CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o: CMakeFiles/metal_metrology.dir/flags.make
-CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o: /home/hzwang/桌面/Hik_yoloobb/src/tracker_ekf.cpp
-CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o: CMakeFiles/metal_metrology.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o -MF CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o.d -o CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o -c /home/hzwang/桌面/Hik_yoloobb/src/tracker_ekf.cpp
-
-CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hzwang/桌面/Hik_yoloobb/src/tracker_ekf.cpp > CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.i
-
-CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hzwang/桌面/Hik_yoloobb/src/tracker_ekf.cpp -o CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.s
-
-CMakeFiles/metal_metrology.dir/src/calibration.cpp.o: CMakeFiles/metal_metrology.dir/flags.make
-CMakeFiles/metal_metrology.dir/src/calibration.cpp.o: /home/hzwang/桌面/Hik_yoloobb/src/calibration.cpp
-CMakeFiles/metal_metrology.dir/src/calibration.cpp.o: CMakeFiles/metal_metrology.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/metal_metrology.dir/src/calibration.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/metal_metrology.dir/src/calibration.cpp.o -MF CMakeFiles/metal_metrology.dir/src/calibration.cpp.o.d -o CMakeFiles/metal_metrology.dir/src/calibration.cpp.o -c /home/hzwang/桌面/Hik_yoloobb/src/calibration.cpp
-
-CMakeFiles/metal_metrology.dir/src/calibration.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/metal_metrology.dir/src/calibration.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hzwang/桌面/Hik_yoloobb/src/calibration.cpp > CMakeFiles/metal_metrology.dir/src/calibration.cpp.i
-
-CMakeFiles/metal_metrology.dir/src/calibration.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/metal_metrology.dir/src/calibration.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hzwang/桌面/Hik_yoloobb/src/calibration.cpp -o CMakeFiles/metal_metrology.dir/src/calibration.cpp.s
-
-CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o: CMakeFiles/metal_metrology.dir/flags.make
-CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o: /home/hzwang/桌面/Hik_yoloobb/src/subpixel_caliper.cpp
-CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o: CMakeFiles/metal_metrology.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o -MF CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o.d -o CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o -c /home/hzwang/桌面/Hik_yoloobb/src/subpixel_caliper.cpp
-
-CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hzwang/桌面/Hik_yoloobb/src/subpixel_caliper.cpp > CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.i
-
-CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hzwang/桌面/Hik_yoloobb/src/subpixel_caliper.cpp -o CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.s
-
 # Object files for target metal_metrology
 metal_metrology_OBJECTS = \
-"CMakeFiles/metal_metrology.dir/src/main.cpp.o" \
-"CMakeFiles/metal_metrology.dir/src/config.cpp.o" \
-"CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o" \
-"CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o" \
-"CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o" \
-"CMakeFiles/metal_metrology.dir/src/calibration.cpp.o" \
-"CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o"
+"CMakeFiles/metal_metrology.dir/src/main.cpp.o"
 
 # External object files for target metal_metrology
 metal_metrology_EXTERNAL_OBJECTS =
 
 metal_metrology: CMakeFiles/metal_metrology.dir/src/main.cpp.o
-metal_metrology: CMakeFiles/metal_metrology.dir/src/config.cpp.o
-metal_metrology: CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o
-metal_metrology: CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o
-metal_metrology: CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o
-metal_metrology: CMakeFiles/metal_metrology.dir/src/calibration.cpp.o
-metal_metrology: CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o
 metal_metrology: CMakeFiles/metal_metrology.dir/build.make
+metal_metrology: libmetal_app.a
+metal_metrology: libmetal_core.a
+metal_metrology: libmetal_foundation.a
+metal_metrology: /home/hzwang/onnxruntime/build/Linux/Release/libonnxruntime.so
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_gapi.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_stitching.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_aruco.so.4.9.0
@@ -216,36 +124,35 @@ metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libop
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_saliency.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_stereo.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_structured_light.so.4.9.0
+metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_phase_unwrapping.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_superres.so.4.9.0
+metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_cudacodec.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_surface_matching.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_tracking.so.4.9.0
-metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_videostab.so.4.9.0
-metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_wechat_qrcode.so.4.9.0
-metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_xfeatures2d.so.4.9.0
-metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_xobjdetect.so.4.9.0
-metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_xphoto.so.4.9.0
-metal_metrology: /home/hzwang/onnxruntime/build/Linux/Release/libonnxruntime.so
-metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_shape.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_highgui.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_datasets.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_plot.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_text.so.4.9.0
-metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_ml.so.4.9.0
-metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_phase_unwrapping.so.4.9.0
-metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_cudacodec.so.4.9.0
+metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_videostab.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_videoio.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_cudaoptflow.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_cudalegacy.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_cudawarping.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_optflow.so.4.9.0
+metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_wechat_qrcode.so.4.9.0
+metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_xfeatures2d.so.4.9.0
+metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_ml.so.4.9.0
+metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_shape.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_ximgproc.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_video.so.4.9.0
+metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_xobjdetect.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_imgcodecs.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_objdetect.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_calib3d.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_dnn.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_features2d.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_flann.so.4.9.0
+metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_xphoto.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_photo.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_cudaimgproc.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_cudafilters.so.4.9.0
@@ -254,7 +161,7 @@ metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libop
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_core.so.4.9.0
 metal_metrology: /home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib/libopencv_cudev.so.4.9.0
 metal_metrology: CMakeFiles/metal_metrology.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable metal_metrology"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable metal_metrology"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/metal_metrology.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

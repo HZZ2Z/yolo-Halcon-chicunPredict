@@ -54,7 +54,7 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/metal_metrology")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/metal_metrology"
-         OLD_RPATH "/opt/MVS/lib/64:/home/hzwang/onnxruntime/build/Linux/Release:/usr/local/cuda-12.1/lib64:/home/hzwang/MVTec/HALCON-25.11-Progress/lib/x64-linux:/home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib:"
+         OLD_RPATH "/home/hzwang/MVTec/HALCON-25.11-Progress/lib/x64-linux:/opt/MVS/lib/64:/home/hzwang/onnxruntime/build/Linux/Release:/usr/local/cuda-12.1/lib64:/home/hzwang/projects/opencv_build/opencv-4.9.0/build/lib:"
          NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/metal_metrology")

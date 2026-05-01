@@ -1,3 +1,6 @@
+/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles/metal_foundation.dir
+/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles/metal_core.dir
+/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles/metal_app.dir
 /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles/metal_metrology.dir
 /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles/edit_cache.dir
 /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles/rebuild_cache.dir

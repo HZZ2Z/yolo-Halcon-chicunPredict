@@ -10,7 +10,6 @@ int main(int argc, char** argv) {
         }
 
         AppConfig cfg = LoadConfig(config_path);
-        logger::SetDebugEnabled(cfg.enable_diag_logs);
         return RunPipeline(cfg);
     } catch (const std::exception& e) {
         logger::Error(std::string("运行失败: ") + e.what());

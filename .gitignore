@@ -1,0 +1,12 @@
+build/
+build_*/
+.codex
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Testing/
+*.o
+*.a
+*.so
+*.log

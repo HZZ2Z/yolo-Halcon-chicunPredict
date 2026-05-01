@@ -162,6 +162,45 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named metal_foundation
+
+# Build rule for target.
+metal_foundation: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 metal_foundation
+.PHONY : metal_foundation
+
+# fast build rule for target.
+metal_foundation/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/build
+.PHONY : metal_foundation/fast
+
+#=============================================================================
+# Target rules for targets named metal_core
+
+# Build rule for target.
+metal_core: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 metal_core
+.PHONY : metal_core
+
+# fast build rule for target.
+metal_core/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/build
+.PHONY : metal_core/fast
+
+#=============================================================================
+# Target rules for targets named metal_app
+
+# Build rule for target.
+metal_app: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 metal_app
+.PHONY : metal_app
+
+# fast build rule for target.
+metal_app/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/build
+.PHONY : metal_app/fast
+
+#=============================================================================
 # Target rules for targets named metal_metrology
 
 # Build rule for target.
@@ -174,12 +213,132 @@ metal_metrology/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/build
 .PHONY : metal_metrology/fast
 
+src/app/frame_processor.o: src/app/frame_processor.cpp.o
+.PHONY : src/app/frame_processor.o
+
+# target to build an object file
+src/app/frame_processor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/frame_processor.cpp.o
+.PHONY : src/app/frame_processor.cpp.o
+
+src/app/frame_processor.i: src/app/frame_processor.cpp.i
+.PHONY : src/app/frame_processor.i
+
+# target to preprocess a source file
+src/app/frame_processor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/frame_processor.cpp.i
+.PHONY : src/app/frame_processor.cpp.i
+
+src/app/frame_processor.s: src/app/frame_processor.cpp.s
+.PHONY : src/app/frame_processor.s
+
+# target to generate assembly for a file
+src/app/frame_processor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/frame_processor.cpp.s
+.PHONY : src/app/frame_processor.cpp.s
+
+src/app/frame_visualizer.o: src/app/frame_visualizer.cpp.o
+.PHONY : src/app/frame_visualizer.o
+
+# target to build an object file
+src/app/frame_visualizer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/frame_visualizer.cpp.o
+.PHONY : src/app/frame_visualizer.cpp.o
+
+src/app/frame_visualizer.i: src/app/frame_visualizer.cpp.i
+.PHONY : src/app/frame_visualizer.i
+
+# target to preprocess a source file
+src/app/frame_visualizer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/frame_visualizer.cpp.i
+.PHONY : src/app/frame_visualizer.cpp.i
+
+src/app/frame_visualizer.s: src/app/frame_visualizer.cpp.s
+.PHONY : src/app/frame_visualizer.s
+
+# target to generate assembly for a file
+src/app/frame_visualizer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/frame_visualizer.cpp.s
+.PHONY : src/app/frame_visualizer.cpp.s
+
+src/app/pipeline_context.o: src/app/pipeline_context.cpp.o
+.PHONY : src/app/pipeline_context.o
+
+# target to build an object file
+src/app/pipeline_context.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/pipeline_context.cpp.o
+.PHONY : src/app/pipeline_context.cpp.o
+
+src/app/pipeline_context.i: src/app/pipeline_context.cpp.i
+.PHONY : src/app/pipeline_context.i
+
+# target to preprocess a source file
+src/app/pipeline_context.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/pipeline_context.cpp.i
+.PHONY : src/app/pipeline_context.cpp.i
+
+src/app/pipeline_context.s: src/app/pipeline_context.cpp.s
+.PHONY : src/app/pipeline_context.s
+
+# target to generate assembly for a file
+src/app/pipeline_context.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/pipeline_context.cpp.s
+.PHONY : src/app/pipeline_context.cpp.s
+
+src/app/pipeline_init.o: src/app/pipeline_init.cpp.o
+.PHONY : src/app/pipeline_init.o
+
+# target to build an object file
+src/app/pipeline_init.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/pipeline_init.cpp.o
+.PHONY : src/app/pipeline_init.cpp.o
+
+src/app/pipeline_init.i: src/app/pipeline_init.cpp.i
+.PHONY : src/app/pipeline_init.i
+
+# target to preprocess a source file
+src/app/pipeline_init.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/pipeline_init.cpp.i
+.PHONY : src/app/pipeline_init.cpp.i
+
+src/app/pipeline_init.s: src/app/pipeline_init.cpp.s
+.PHONY : src/app/pipeline_init.s
+
+# target to generate assembly for a file
+src/app/pipeline_init.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/pipeline_init.cpp.s
+.PHONY : src/app/pipeline_init.cpp.s
+
+src/app/pipeline_runner.o: src/app/pipeline_runner.cpp.o
+.PHONY : src/app/pipeline_runner.o
+
+# target to build an object file
+src/app/pipeline_runner.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/pipeline_runner.cpp.o
+.PHONY : src/app/pipeline_runner.cpp.o
+
+src/app/pipeline_runner.i: src/app/pipeline_runner.cpp.i
+.PHONY : src/app/pipeline_runner.i
+
+# target to preprocess a source file
+src/app/pipeline_runner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/pipeline_runner.cpp.i
+.PHONY : src/app/pipeline_runner.cpp.i
+
+src/app/pipeline_runner.s: src/app/pipeline_runner.cpp.s
+.PHONY : src/app/pipeline_runner.s
+
+# target to generate assembly for a file
+src/app/pipeline_runner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/src/app/pipeline_runner.cpp.s
+.PHONY : src/app/pipeline_runner.cpp.s
+
 src/calibration.o: src/calibration.cpp.o
 .PHONY : src/calibration.o
 
 # target to build an object file
 src/calibration.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/calibration.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/calibration.cpp.o
 .PHONY : src/calibration.cpp.o
 
 src/calibration.i: src/calibration.cpp.i
@@ -187,7 +346,7 @@ src/calibration.i: src/calibration.cpp.i
 
 # target to preprocess a source file
 src/calibration.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/calibration.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/calibration.cpp.i
 .PHONY : src/calibration.cpp.i
 
 src/calibration.s: src/calibration.cpp.s
@@ -195,7 +354,7 @@ src/calibration.s: src/calibration.cpp.s
 
 # target to generate assembly for a file
 src/calibration.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/calibration.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/calibration.cpp.s
 .PHONY : src/calibration.cpp.s
 
 src/camera_provider.o: src/camera_provider.cpp.o
@@ -203,7 +362,7 @@ src/camera_provider.o: src/camera_provider.cpp.o
 
 # target to build an object file
 src/camera_provider.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/camera_provider.cpp.o
 .PHONY : src/camera_provider.cpp.o
 
 src/camera_provider.i: src/camera_provider.cpp.i
@@ -211,7 +370,7 @@ src/camera_provider.i: src/camera_provider.cpp.i
 
 # target to preprocess a source file
 src/camera_provider.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/camera_provider.cpp.i
 .PHONY : src/camera_provider.cpp.i
 
 src/camera_provider.s: src/camera_provider.cpp.s
@@ -219,7 +378,7 @@ src/camera_provider.s: src/camera_provider.cpp.s
 
 # target to generate assembly for a file
 src/camera_provider.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/camera_provider.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/camera_provider.cpp.s
 .PHONY : src/camera_provider.cpp.s
 
 src/config.o: src/config.cpp.o
@@ -227,7 +386,7 @@ src/config.o: src/config.cpp.o
 
 # target to build an object file
 src/config.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/config.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/src/config.cpp.o
 .PHONY : src/config.cpp.o
 
 src/config.i: src/config.cpp.i
@@ -235,7 +394,7 @@ src/config.i: src/config.cpp.i
 
 # target to preprocess a source file
 src/config.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/config.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/src/config.cpp.i
 .PHONY : src/config.cpp.i
 
 src/config.s: src/config.cpp.s
@@ -243,8 +402,32 @@ src/config.s: src/config.cpp.s
 
 # target to generate assembly for a file
 src/config.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/config.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/src/config.cpp.s
 .PHONY : src/config.cpp.s
+
+src/logger.o: src/logger.cpp.o
+.PHONY : src/logger.o
+
+# target to build an object file
+src/logger.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/src/logger.cpp.o
+.PHONY : src/logger.cpp.o
+
+src/logger.i: src/logger.cpp.i
+.PHONY : src/logger.i
+
+# target to preprocess a source file
+src/logger.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/src/logger.cpp.i
+.PHONY : src/logger.cpp.i
+
+src/logger.s: src/logger.cpp.s
+.PHONY : src/logger.s
+
+# target to generate assembly for a file
+src/logger.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/src/logger.cpp.s
+.PHONY : src/logger.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -270,12 +453,36 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/measurement_uncertainty.o: src/measurement_uncertainty.cpp.o
+.PHONY : src/measurement_uncertainty.o
+
+# target to build an object file
+src/measurement_uncertainty.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/measurement_uncertainty.cpp.o
+.PHONY : src/measurement_uncertainty.cpp.o
+
+src/measurement_uncertainty.i: src/measurement_uncertainty.cpp.i
+.PHONY : src/measurement_uncertainty.i
+
+# target to preprocess a source file
+src/measurement_uncertainty.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/measurement_uncertainty.cpp.i
+.PHONY : src/measurement_uncertainty.cpp.i
+
+src/measurement_uncertainty.s: src/measurement_uncertainty.cpp.s
+.PHONY : src/measurement_uncertainty.s
+
+# target to generate assembly for a file
+src/measurement_uncertainty.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/measurement_uncertainty.cpp.s
+.PHONY : src/measurement_uncertainty.cpp.s
+
 src/onnx_inferencer.o: src/onnx_inferencer.cpp.o
 .PHONY : src/onnx_inferencer.o
 
 # target to build an object file
 src/onnx_inferencer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/onnx_inferencer.cpp.o
 .PHONY : src/onnx_inferencer.cpp.o
 
 src/onnx_inferencer.i: src/onnx_inferencer.cpp.i
@@ -283,7 +490,7 @@ src/onnx_inferencer.i: src/onnx_inferencer.cpp.i
 
 # target to preprocess a source file
 src/onnx_inferencer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/onnx_inferencer.cpp.i
 .PHONY : src/onnx_inferencer.cpp.i
 
 src/onnx_inferencer.s: src/onnx_inferencer.cpp.s
@@ -291,7 +498,7 @@ src/onnx_inferencer.s: src/onnx_inferencer.cpp.s
 
 # target to generate assembly for a file
 src/onnx_inferencer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/onnx_inferencer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/onnx_inferencer.cpp.s
 .PHONY : src/onnx_inferencer.cpp.s
 
 src/subpixel_caliper.o: src/subpixel_caliper.cpp.o
@@ -299,7 +506,7 @@ src/subpixel_caliper.o: src/subpixel_caliper.cpp.o
 
 # target to build an object file
 src/subpixel_caliper.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/subpixel_caliper.cpp.o
 .PHONY : src/subpixel_caliper.cpp.o
 
 src/subpixel_caliper.i: src/subpixel_caliper.cpp.i
@@ -307,7 +514,7 @@ src/subpixel_caliper.i: src/subpixel_caliper.cpp.i
 
 # target to preprocess a source file
 src/subpixel_caliper.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/subpixel_caliper.cpp.i
 .PHONY : src/subpixel_caliper.cpp.i
 
 src/subpixel_caliper.s: src/subpixel_caliper.cpp.s
@@ -315,7 +522,7 @@ src/subpixel_caliper.s: src/subpixel_caliper.cpp.s
 
 # target to generate assembly for a file
 src/subpixel_caliper.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/subpixel_caliper.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/subpixel_caliper.cpp.s
 .PHONY : src/subpixel_caliper.cpp.s
 
 src/tracker_ekf.o: src/tracker_ekf.cpp.o
@@ -323,7 +530,7 @@ src/tracker_ekf.o: src/tracker_ekf.cpp.o
 
 # target to build an object file
 src/tracker_ekf.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/tracker_ekf.cpp.o
 .PHONY : src/tracker_ekf.cpp.o
 
 src/tracker_ekf.i: src/tracker_ekf.cpp.i
@@ -331,7 +538,7 @@ src/tracker_ekf.i: src/tracker_ekf.cpp.i
 
 # target to preprocess a source file
 src/tracker_ekf.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/tracker_ekf.cpp.i
 .PHONY : src/tracker_ekf.cpp.i
 
 src/tracker_ekf.s: src/tracker_ekf.cpp.s
@@ -339,7 +546,7 @@ src/tracker_ekf.s: src/tracker_ekf.cpp.s
 
 # target to generate assembly for a file
 src/tracker_ekf.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/src/tracker_ekf.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/src/tracker_ekf.cpp.s
 .PHONY : src/tracker_ekf.cpp.s
 
 # Help Target
@@ -354,7 +561,25 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
+	@echo "... metal_app"
+	@echo "... metal_core"
+	@echo "... metal_foundation"
 	@echo "... metal_metrology"
+	@echo "... src/app/frame_processor.o"
+	@echo "... src/app/frame_processor.i"
+	@echo "... src/app/frame_processor.s"
+	@echo "... src/app/frame_visualizer.o"
+	@echo "... src/app/frame_visualizer.i"
+	@echo "... src/app/frame_visualizer.s"
+	@echo "... src/app/pipeline_context.o"
+	@echo "... src/app/pipeline_context.i"
+	@echo "... src/app/pipeline_context.s"
+	@echo "... src/app/pipeline_init.o"
+	@echo "... src/app/pipeline_init.i"
+	@echo "... src/app/pipeline_init.s"
+	@echo "... src/app/pipeline_runner.o"
+	@echo "... src/app/pipeline_runner.i"
+	@echo "... src/app/pipeline_runner.s"
 	@echo "... src/calibration.o"
 	@echo "... src/calibration.i"
 	@echo "... src/calibration.s"
@@ -364,9 +589,15 @@ help:
 	@echo "... src/config.o"
 	@echo "... src/config.i"
 	@echo "... src/config.s"
+	@echo "... src/logger.o"
+	@echo "... src/logger.i"
+	@echo "... src/logger.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/measurement_uncertainty.o"
+	@echo "... src/measurement_uncertainty.i"
+	@echo "... src/measurement_uncertainty.s"
 	@echo "... src/onnx_inferencer.o"
 	@echo "... src/onnx_inferencer.i"
 	@echo "... src/onnx_inferencer.s"

@@ -63,6 +63,9 @@ CMAKE_BINARY_DIR = /home/hzwang/桌面/Hik_yoloobb/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/metal_foundation.dir/all
+all: CMakeFiles/metal_core.dir/all
+all: CMakeFiles/metal_app.dir/all
 all: CMakeFiles/metal_metrology.dir/all
 .PHONY : all
 
@@ -71,22 +74,106 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/metal_foundation.dir/clean
+clean: CMakeFiles/metal_core.dir/clean
+clean: CMakeFiles/metal_app.dir/clean
 clean: CMakeFiles/metal_metrology.dir/clean
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/metal_foundation.dir
+
+# All Build rule for target.
+CMakeFiles/metal_foundation.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=14,15,16 "Built target metal_foundation"
+.PHONY : CMakeFiles/metal_foundation.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/metal_foundation.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/metal_foundation.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles 0
+.PHONY : CMakeFiles/metal_foundation.dir/rule
+
+# Convenience name for target.
+metal_foundation: CMakeFiles/metal_foundation.dir/rule
+.PHONY : metal_foundation
+
+# clean rule for target.
+CMakeFiles/metal_foundation.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_foundation.dir/build.make CMakeFiles/metal_foundation.dir/clean
+.PHONY : CMakeFiles/metal_foundation.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/metal_core.dir
+
+# All Build rule for target.
+CMakeFiles/metal_core.dir/all: CMakeFiles/metal_foundation.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=7,8,9,10,11,12,13 "Built target metal_core"
+.PHONY : CMakeFiles/metal_core.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/metal_core.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles 10
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/metal_core.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles 0
+.PHONY : CMakeFiles/metal_core.dir/rule
+
+# Convenience name for target.
+metal_core: CMakeFiles/metal_core.dir/rule
+.PHONY : metal_core
+
+# clean rule for target.
+CMakeFiles/metal_core.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_core.dir/build.make CMakeFiles/metal_core.dir/clean
+.PHONY : CMakeFiles/metal_core.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/metal_app.dir
+
+# All Build rule for target.
+CMakeFiles/metal_app.dir/all: CMakeFiles/metal_foundation.dir/all
+CMakeFiles/metal_app.dir/all: CMakeFiles/metal_core.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target metal_app"
+.PHONY : CMakeFiles/metal_app.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/metal_app.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles 16
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/metal_app.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles 0
+.PHONY : CMakeFiles/metal_app.dir/rule
+
+# Convenience name for target.
+metal_app: CMakeFiles/metal_app.dir/rule
+.PHONY : metal_app
+
+# clean rule for target.
+CMakeFiles/metal_app.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_app.dir/build.make CMakeFiles/metal_app.dir/clean
+.PHONY : CMakeFiles/metal_app.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/metal_metrology.dir
 
 # All Build rule for target.
-CMakeFiles/metal_metrology.dir/all:
+CMakeFiles/metal_metrology.dir/all: CMakeFiles/metal_foundation.dir/all
+CMakeFiles/metal_metrology.dir/all: CMakeFiles/metal_core.dir/all
+CMakeFiles/metal_metrology.dir/all: CMakeFiles/metal_app.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/metal_metrology.dir/build.make CMakeFiles/metal_metrology.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8 "Built target metal_metrology"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles --progress-num=17,18 "Built target metal_metrology"
 .PHONY : CMakeFiles/metal_metrology.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/metal_metrology.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles 18
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/metal_metrology.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/hzwang/桌面/Hik_yoloobb/build/CMakeFiles 0
 .PHONY : CMakeFiles/metal_metrology.dir/rule

@@ -10,6 +10,7 @@ public:
     ObbTracker();
     void reset();
     OBBResult update(const std::optional<OBBResult>& obs);
+    cv::Matx33f poseCovariance() const;
 
 private:
     cv::KalmanFilter kf_;

@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <limits>
+#include <system_error>
 #include <string>
 
 namespace fs = std::filesystem;
@@ -117,13 +118,51 @@ bool CalibrationMapper::loadFromDirectory(const std::string& dir_path) {
 
 bool CalibrationMapper::loadFromFiles(const std::string& campar_path, const std::string& pose_path) {
 #ifdef USE_HALCON
+    const fs::path temp_dir = fs::temp_directory_path() / "hik_yoloobb_halcon_calib";
+    const fs::path temp_campar = temp_dir / "camera_parameters.cal";
+    const fs::path temp_pose = temp_dir / "camera_pose.dat";
+    std::string halcon_campar_path = campar_path;
+    std::string halcon_pose_path = pose_path;
+
     try {
-        HalconCpp::ReadCamPar(campar_path.c_str(), &cam_param_);
-        HalconCpp::ReadPose(pose_path.c_str(), &world_pose_);
+        std::error_code ec;
+        fs::create_directories(temp_dir, ec);
+        if (ec) {
+            logger::Warn(std::string("[HALCON] 创建临时标定目录失败: ") + temp_dir.string() +
+                         ", error=" + ec.message());
+        } else {
+            fs::copy_file(campar_path, temp_campar, fs::copy_options::overwrite_existing, ec);
+            if (ec) {
+                logger::Warn(std::string("[HALCON] 复制相机参数到临时路径失败: src=") + campar_path +
+                             ", dst=" + temp_campar.string() + ", error=" + ec.message());
+            } else {
+                halcon_campar_path = temp_campar.string();
+            }
+
+            ec.clear();
+            fs::copy_file(pose_path, temp_pose, fs::copy_options::overwrite_existing, ec);
+            if (ec) {
+                logger::Warn(std::string("[HALCON] 复制位姿到临时路径失败: src=") + pose_path +
+                             ", dst=" + temp_pose.string() + ", error=" + ec.message());
+            } else {
+                halcon_pose_path = temp_pose.string();
+            }
+        }
+    } catch (const std::exception& e) {
+        logger::Warn(std::string("[HALCON] 准备 ASCII 临时标定路径异常: ") + e.what());
+    }
+
+    try {
+        logger::Info(std::string("[HALCON] 读取标定临时路径: campar=") + halcon_campar_path +
+                     ", pose=" + halcon_pose_path);
+        HalconCpp::ReadCamPar(halcon_campar_path.c_str(), &cam_param_);
+        HalconCpp::ReadPose(halcon_pose_path.c_str(), &world_pose_);
         ready_ = true;
         return true;
     } catch (const HalconCpp::HException& e) {
         logger::Error(std::string("[HALCON] 读取标定失败: campar=") + campar_path + ", pose=" + pose_path);
+        logger::Error(std::string("[HALCON] 临时路径: campar=") + halcon_campar_path +
+                      ", pose=" + halcon_pose_path);
         logger::Error(std::string("[HALCON] 异常: ") + e.ErrorMessage().Text());
         ready_ = false;
         projection_valid_ = false;

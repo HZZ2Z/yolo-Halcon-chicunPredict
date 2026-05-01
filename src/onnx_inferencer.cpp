@@ -14,6 +14,19 @@
 OnnxObbInferencer::OnnxObbInferencer(const std::string& model_path, float conf_thresh, float nms_thresh)
     : model_path_(model_path), conf_thresh_(conf_thresh), nms_thresh_(nms_thresh) {}
 
+OnnxObbInferencer::~OnnxObbInferencer() {
+#ifdef USE_ONNXRUNTIME
+    if (session_) {
+        delete reinterpret_cast<Ort::Session*>(session_);
+        session_ = nullptr;
+    }
+    if (env_) {
+        delete reinterpret_cast<Ort::Env*>(env_);
+        env_ = nullptr;
+    }
+#endif
+}
+
 bool OnnxObbInferencer::init() {
 #ifdef USE_ONNXRUNTIME
     if (model_path_.empty()) {

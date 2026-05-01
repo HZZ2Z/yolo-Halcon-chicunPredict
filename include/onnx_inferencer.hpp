@@ -10,6 +10,7 @@
 class OnnxObbInferencer {
 public:
     OnnxObbInferencer(const std::string& model_path, float conf_thresh, float nms_thresh);
+    ~OnnxObbInferencer();
     bool init();
     std::vector<OBBResult> infer(const cv::Mat& image);
 

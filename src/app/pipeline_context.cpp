@@ -8,6 +8,13 @@
 #include "tracker_ekf.hpp"
 
 PipelineContext::PipelineContext() = default;
-PipelineContext::~PipelineContext() = default;
+PipelineContext::~PipelineContext() {
+    visualizer.reset();
+    tracker.reset();
+    caliper.reset();
+    inferencer.reset();
+    calibration.reset();
+    camera.reset();
+}
 PipelineContext::PipelineContext(PipelineContext&&) noexcept = default;
 PipelineContext& PipelineContext::operator=(PipelineContext&&) noexcept = default;
