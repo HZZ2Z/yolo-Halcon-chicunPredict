@@ -1,6 +1,7 @@
 build/
 build_*/
 .codex
+.agents/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
@@ -10,3 +11,17 @@ Testing/
 *.a
 *.so
 *.log
+
+# Python/tool caches
+__pycache__/
+*.py[cod]
+
+# Measurement and calibration experiment outputs
+measurements/*
+!measurements/.gitkeep
+
+# Editor/OS noise
+.vscode/
+.idea/
+.DS_Store
+*~

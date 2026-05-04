@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <opencv2/opencv.hpp>
+#include <string>
 #include <vector>
 
 struct FrameData {
@@ -32,6 +33,11 @@ struct MeasurementResult {
     std::vector<cv::Point2f> right_edge_samples_px;
     std::vector<cv::Matx22f> left_edge_sample_covs_px;
     std::vector<cv::Matx22f> right_edge_sample_covs_px;
+    std::vector<float> scan_quality_samples;
+    float measurement_quality = 0.0f;
+    bool quality_ok = true;
+    std::string quality_reason = "OK";
+    float correction_mm = 0.0f;
 };
 
 inline float deg2rad(float deg) {

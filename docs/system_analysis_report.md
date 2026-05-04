@@ -15,7 +15,7 @@ bash scripts/run_demo.sh
 ```text
 [HALCON] 投影校验通过: 100px -> 9.084496 mm
 [ONNX] CUDA Execution Provider 已启用
-窗口显示: px=353.466980, mm=32.808380, sigma=0.081995, scans=7
+窗口显示: px=353.466980, mm=32.808380, sigma=0.081995, scans=9
 ```
 
 其中：
@@ -24,6 +24,7 @@ bash scripts/run_demo.sh
 - `mm`：经过 5 帧中值平滑后的显示毫米值。
 - `sigma`：由边缘协方差和世界映射雅可比传播得到的毫米标准差估计。
 - `scans`：有效参与测量的平行扫描线数量。
+- `LOW QUALITY`：当前帧未通过 `sigma/scans/跳变` 质量控制，当前边缘点仍会显示，但不会进入最终平滑历史。
 
 ---
 
@@ -49,13 +50,17 @@ flowchart TD
     L --> M
     M --> N{到达 measure_interval?}
     N -- 是 --> O[多扫描线亚像素卡尺]
-    O --> P[像素边缘点 + 像素协方差]
+    O --> O1[极性感知边缘搜索 + 扫描线质量评分]
+    O1 --> P[像素边缘点 + 像素协方差]
     P --> Q[HALCON pixelToWorld 映射到世界平面]
     Q --> R[Huber 鲁棒聚合]
     R --> S[误差传播得到 sigma_mm]
-    S --> T[5 帧中值平滑]
+    S --> S1{质量合格?}
+    S1 -- 是 --> T[5 帧中值平滑]
+    S1 -- 否 --> T0[跳过坏帧并保留上一稳定值]
     N -- 否 --> U[保留上一帧测量]
     T --> V[渲染 OBB/边缘点/尺寸]
+    T0 --> V
     U --> V
 ```
 
@@ -181,7 +186,7 @@ bool estimate_measurement_uncertainty = true;
 
 这些参数控制：
 
-- `multi_scan_count`：默认 7 条平行扫描线。
+- `multi_scan_count`：默认 9 条平行扫描线。
 - `edge_refine_half_window`：亚像素边缘 refinement 使用的梯度窗口半径。
 - `edge_power_gamma`：梯度权重指数，默认平方梯度。
 - `huber_delta_mm`：世界平面聚合的 Huber 截断阈值。
@@ -350,7 +355,7 @@ const cv::Point2f normal(-tangent.y, tangent.x);
 
 ### 8.2 多扫描线生成
 
-系统围绕 OBB 中心生成多条平行扫描线，默认 7 条：
+系统围绕 OBB 中心生成多条平行扫描线，默认 9 条：
 
 ```cpp
 const int scan_count = std::max(1, multi_scan_count_);
@@ -363,7 +368,7 @@ const float scan_offset =
                        static_cast<float>(scan_count - 1));
 ```
 
-扫描线数量越多，对局部反光、螺纹、污渍、阴影干扰越鲁棒，但计算量也线性增加。当前默认 7 条属于实时性和稳定性的折中。
+扫描线数量越多，对局部反光、螺纹、污渍、阴影干扰越鲁棒，但计算量也线性增加。当前默认 9 条更偏向工业稳定性。
 
 ### 8.3 Profile 采样与平滑
 
@@ -625,7 +630,7 @@ mr.world_distance_mm = medianValue(state.mm_history);
 相比早期版本，本系统在以下方面提高了准确性和稳定性：
 
 1. **单线测量改为多线测量**  
-   早期单 profile 对局部反光、污渍、阴影很敏感；现在 7 条扫描线可以让异常线被过滤或降权。
+   早期单 profile 对局部反光、污渍、阴影很敏感；现在 9 条扫描线可以让异常线被过滤或降权。
 
 2. **边缘定位更稳**  
    从单个梯度峰值附近的三点插值，升级为平方梯度加权重心，降低单个噪声峰影响。

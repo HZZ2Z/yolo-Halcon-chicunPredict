@@ -19,16 +19,28 @@ app:
   nms_threshold: 0.30
 
   caliper_length: -1.0
-  caliper_half_width: 8.0
-  gaussian_sigma: 1.0
+  caliper_half_width: 10.0
+  gaussian_sigma: 1.2
   caliper_search_scale: 1.25
   use_obb_adaptive_caliper: 1
   measure_long_edge: 1
-  multi_scan_count: 7
-  edge_refine_half_window: 4
+  multi_scan_count: 9
+  edge_refine_half_window: 5
   edge_power_gamma: 2.0
-  huber_delta_mm: 0.05
+  huber_delta_mm: 0.08
   estimate_measurement_uncertainty: 1
+  max_sigma_mm: 0.10
+  min_valid_scan_count: 5
+  max_frame_jump_mm: 2.00
+  min_edge_length_ratio: 0.82
+  fallback_to_abs_gradient: 1
+
+  enable_measurement_csv: 0
+  measurement_csv_path: "measurements/measurement_log.csv"
+  standard_true_mm: -1.0
+  residual_compensation_file: ""
 
   show_window: 1
+  display_max_width: 1280
+  display_max_height: 760
   strict_calibration: 1

@@ -64,6 +64,7 @@ add_library(metal_core STATIC
     src/calibration.cpp
     src/subpixel_caliper.cpp
     src/measurement_uncertainty.cpp
+    src/spatial_error_compensator.cpp
 )
 
 target_include_directories(metal_core PUBLIC

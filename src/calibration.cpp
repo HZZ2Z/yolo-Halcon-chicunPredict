@@ -2,12 +2,14 @@
 
 #include "logger.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <limits>
 #include <system_error>
 #include <string>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -253,4 +255,48 @@ cv::Point2f CalibrationMapper::pixelToWorld(const cv::Point2f& px) const {
     (void)px;
     return cv::Point2f(std::numeric_limits<float>::quiet_NaN(),
                        std::numeric_limits<float>::quiet_NaN());
+}
+
+void CalibrationMapper::logScaleDiagnostics(int image_width, int image_height) const {
+    if (!canMeasureInMm() || image_width <= 0 || image_height <= 0) {
+        return;
+    }
+
+    struct Probe {
+        const char* name = "";
+        cv::Point2f p;
+    };
+
+    const float margin_x = std::max(50.0f, static_cast<float>(image_width) * 0.12f);
+    const float margin_y = std::max(50.0f, static_cast<float>(image_height) * 0.12f);
+    const std::vector<Probe> probes = {
+        {"center", cv::Point2f(image_width * 0.5f, image_height * 0.5f)},
+        {"left_top", cv::Point2f(margin_x, margin_y)},
+        {"right_top", cv::Point2f(image_width - margin_x, margin_y)},
+        {"left_bottom", cv::Point2f(margin_x, image_height - margin_y)},
+        {"right_bottom", cv::Point2f(image_width - margin_x, image_height - margin_y)},
+    };
+
+    const float step = std::min(100.0f, std::max(20.0f, std::min(image_width, image_height) * 0.08f));
+    for (const Probe& probe : probes) {
+        const cv::Point2f p0(std::clamp(probe.p.x, 0.0f, static_cast<float>(image_width - 1)),
+                             std::clamp(probe.p.y, 0.0f, static_cast<float>(image_height - 1)));
+        const cv::Point2f px(std::clamp(p0.x + step, 0.0f, static_cast<float>(image_width - 1)), p0.y);
+        const cv::Point2f py(p0.x, std::clamp(p0.y + step, 0.0f, static_cast<float>(image_height - 1)));
+
+        const cv::Point2f w0 = pixelToWorld(p0);
+        const cv::Point2f wx = pixelToWorld(px);
+        const cv::Point2f wy = pixelToWorld(py);
+        if (!std::isfinite(w0.x) || !std::isfinite(w0.y) ||
+            !std::isfinite(wx.x) || !std::isfinite(wx.y) ||
+            !std::isfinite(wy.x) || !std::isfinite(wy.y)) {
+            continue;
+        }
+
+        const double sx = cv::norm(wx - w0) / std::max(1.0f, px.x - p0.x);
+        const double sy = cv::norm(wy - w0) / std::max(1.0f, py.y - p0.y);
+        logger::Info(std::string("[CALIB] local scale ") + probe.name +
+                     ": sx=" + std::to_string(sx) +
+                     " mm/px, sy=" + std::to_string(sy) + " mm/px");
+    }
 }

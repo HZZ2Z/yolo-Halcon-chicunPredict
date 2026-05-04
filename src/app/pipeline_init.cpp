@@ -5,6 +5,7 @@
 #include "camera_provider.hpp"
 #include "logger.hpp"
 #include "onnx_inferencer.hpp"
+#include "spatial_error_compensator.hpp"
 #include "subpixel_caliper.hpp"
 #include "tracker_ekf.hpp"
 
@@ -26,6 +27,9 @@ bool InitializePipeline(const AppConfig& cfg, PipelineContext& context) {
         logger::Error("错误: strict_calibration=1 但当前标定无法完成毫米换算。");
         logger::Error("HALCON 模式下请提供有效的相机参数(.cal)与位姿文件(.dat)。");
         return false;
+    }
+    if (context.calibration->canMeasureInMm()) {
+        context.calibration->logScaleDiagnostics(cfg.frame_width, cfg.frame_height);
     }
 
     context.camera = std::make_unique<CameraProvider>(cfg.input_source, cfg.frame_width, cfg.frame_height);
@@ -51,7 +55,15 @@ bool InitializePipeline(const AppConfig& cfg, PipelineContext& context) {
                                                         cfg.measure_long_edge,
                                                         cfg.multi_scan_count,
                                                         cfg.edge_refine_half_window,
-                                                        cfg.edge_power_gamma);
+                                                        cfg.edge_power_gamma,
+                                                        cfg.min_edge_length_ratio,
+                                                        cfg.fallback_to_abs_gradient);
+    context.compensator = std::make_unique<SpatialErrorCompensator>();
+    if (!cfg.residual_compensation_file.empty()) {
+        if (!context.compensator->load(cfg.residual_compensation_file)) {
+            logger::Warn("警告: 残差补偿文件加载失败，当前运行不启用空间残差补偿。");
+        }
+    }
     context.tracker = std::make_unique<ObbTracker>();
     context.visualizer = std::make_unique<FrameVisualizer>();
 

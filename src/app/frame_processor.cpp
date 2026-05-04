@@ -5,16 +5,30 @@
 #include "logger.hpp"
 #include "measurement_uncertainty.hpp"
 #include "onnx_inferencer.hpp"
+#include "spatial_error_compensator.hpp"
 #include "subpixel_caliper.hpp"
 #include "tracker_ekf.hpp"
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <sstream>
 #include <vector>
 
 namespace {
 
 constexpr size_t kSmoothWindow = 5;
+
+std::string formatFloat(float value, int precision = 3) {
+    if (!std::isfinite(value)) {
+        return "N/A";
+    }
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(precision) << value;
+    return oss.str();
+}
 
 float medianValue(const std::deque<float>& values) {
     if (values.empty()) {
@@ -43,6 +57,91 @@ void smoothMeasurement(MeasurementResult& mr, FrameProcessorState& state) {
         }
         mr.world_distance_mm = medianValue(state.mm_history);
     }
+}
+
+std::string evaluateMeasurementQuality(const AppConfig& cfg,
+                                       const MeasurementResult& mr,
+                                       const FrameProcessorState& state) {
+    if (cfg.min_valid_scan_count > 0 && mr.valid_scan_count < cfg.min_valid_scan_count) {
+        return "LOW_SCANS scans=" + std::to_string(mr.valid_scan_count) +
+               "/" + std::to_string(cfg.min_valid_scan_count);
+    }
+    if (mr.world_sigma_mm >= 0.0f && std::isfinite(mr.world_sigma_mm) &&
+        mr.world_sigma_mm > cfg.max_sigma_mm) {
+        return "HIGH_SIGMA sigma=" + formatFloat(mr.world_sigma_mm) +
+               "mm > " + formatFloat(cfg.max_sigma_mm) + "mm";
+    }
+    if (!state.mm_history.empty() && mr.world_distance_mm > 0.0f &&
+        std::isfinite(mr.world_distance_mm)) {
+        const float stable_mm = medianValue(state.mm_history);
+        const float jump_mm = std::abs(mr.world_distance_mm - stable_mm);
+        if (jump_mm > cfg.max_frame_jump_mm) {
+            return "FRAME_JUMP jump=" + formatFloat(jump_mm) +
+                   "mm > " + formatFloat(cfg.max_frame_jump_mm) + "mm";
+        }
+    }
+    return "OK";
+}
+
+void ensureCsvOpen(const AppConfig& cfg, FrameProcessorState& state) {
+    if (!cfg.enable_measurement_csv || state.csv.is_open()) {
+        return;
+    }
+
+    const std::filesystem::path path(cfg.measurement_csv_path);
+    if (path.has_parent_path()) {
+        std::error_code ec;
+        std::filesystem::create_directories(path.parent_path(), ec);
+    }
+
+    const bool needs_header =
+        !std::filesystem::exists(path) || std::filesystem::file_size(path) == 0;
+    state.csv.open(path, std::ios::app);
+    if (!state.csv.is_open()) {
+        logger::Warn(std::string("[CSV] 无法打开测量记录文件: ") + cfg.measurement_csv_path);
+        return;
+    }
+    state.csv_header_written = !needs_header;
+    if (!state.csv_header_written) {
+        state.csv << "frame_id,cx,cy,angle,px,raw_mm,mm,sigma,scans,quality,"
+                     "correction_mm,true_mm,error_mm\n";
+        state.csv_header_written = true;
+    }
+}
+
+void writeMeasurementCsv(const AppConfig& cfg,
+                         FrameProcessorState& state,
+                         const MeasurementResult& mr,
+                         const OBBResult& tracked) {
+    if (!cfg.enable_measurement_csv) {
+        return;
+    }
+    ensureCsvOpen(cfg, state);
+    if (!state.csv.is_open()) {
+        return;
+    }
+
+    const float true_mm = cfg.standard_true_mm > 0.0f ? cfg.standard_true_mm : -1.0f;
+    const float error_mm =
+        (true_mm > 0.0f && mr.raw_world_distance_mm > 0.0f)
+            ? (mr.raw_world_distance_mm - true_mm)
+            : -1.0f;
+
+    state.csv << std::fixed << std::setprecision(6)
+              << mr.frame_id << ','
+              << tracked.rrect.center.x << ','
+              << tracked.rrect.center.y << ','
+              << tracked.rrect.angle << ','
+              << mr.pixel_distance << ','
+              << mr.raw_world_distance_mm << ','
+              << mr.world_distance_mm << ','
+              << mr.world_sigma_mm << ','
+              << mr.valid_scan_count << ','
+              << mr.quality_reason << ','
+              << mr.correction_mm << ','
+              << true_mm << ','
+              << error_mm << '\n';
+    state.csv.flush();
 }
 
 bool isFinitePoint(const cv::Point2f& p) {
@@ -195,8 +294,30 @@ bool ProcessFrame(FrameData frame,
                             mr,
                             cfg.huber_delta_mm,
                             cfg.estimate_measurement_uncertainty);
-        smoothMeasurement(mr, state);
-        state.last_measurement = mr;
+        if (context.compensator && context.compensator->ready() &&
+            mr.raw_world_distance_mm > 0.0f && std::isfinite(mr.raw_world_distance_mm)) {
+            const float corr = context.compensator->correction(tracked.rrect.center.x,
+                                                               tracked.rrect.center.y);
+            mr.correction_mm = corr;
+            mr.raw_world_distance_mm += corr;
+            mr.world_distance_mm += corr;
+        }
+
+        const std::string quality = evaluateMeasurementQuality(cfg, mr, state);
+        mr.quality_ok = quality == "OK";
+        mr.quality_reason = quality;
+        if (mr.quality_ok) {
+            state.rejected_measurement_count = 0;
+            smoothMeasurement(mr, state);
+            state.last_measurement = mr;
+        } else {
+            ++state.rejected_measurement_count;
+            logger::Warn(std::string("[MEASURE] 低质量帧已跳过: reason=") + quality +
+                         ", sigma=" + std::to_string(mr.world_sigma_mm) +
+                         ", scans=" + std::to_string(mr.valid_scan_count));
+            state.last_measurement = mr;
+        }
+        writeMeasurementCsv(cfg, state, mr, tracked);
     }
 
     if (cfg.show_window) {

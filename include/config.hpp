@@ -33,8 +33,23 @@ struct AppConfig {
     float edge_power_gamma = 2.0f;
     float huber_delta_mm = 0.05f;
     bool estimate_measurement_uncertainty = true;
+    float max_sigma_mm = 0.10f;
+    int min_valid_scan_count = 5;
+    float max_frame_jump_mm = 2.00f;
+    float min_edge_length_ratio = 0.82f;
+    bool fallback_to_abs_gradient = true;
+
+    bool enable_measurement_csv = false;
+    std::string measurement_csv_path = "measurements.csv";
+    float standard_true_mm = -1.0f;
+    std::string residual_compensation_file;
+
+    bool show_grid_guide = false;
+    std::string grid_guide_position;
 
     bool show_window = true;
+    int display_max_width = 1280;
+    int display_max_height = 760;
     bool strict_calibration = true;
 };
 

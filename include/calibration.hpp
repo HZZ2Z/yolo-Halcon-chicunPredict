@@ -17,6 +17,7 @@ public:
     cv::Point2f pixelToWorld(const cv::Point2f& px) const;
     bool hasHomography() const;
     bool canMeasureInMm() const;
+    void logScaleDiagnostics(int image_width, int image_height) const;
 
 private:
     bool loadFromDirectory(const std::string& dir_path);

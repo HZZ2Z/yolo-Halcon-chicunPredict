@@ -14,7 +14,9 @@ public:
                     bool measure_long_edge,
                     int multi_scan_count,
                     int edge_refine_half_window,
-                    float edge_power_gamma);
+                    float edge_power_gamma,
+                    float min_edge_length_ratio,
+                    bool fallback_to_abs_gradient);
     MeasurementResult measure(const FrameData& frame,
                               const OBBResult& obb,
                               const cv::Matx33f* pose_covariance = nullptr) const;
@@ -25,12 +27,14 @@ private:
         float u = 0.0f;
         float variance_u = 1.0f;
         float strength = 0.0f;
+        float peak_ratio = 0.0f;
+        float quality = 0.0f;
     };
 
     float bilinearAt(const cv::Mat& gray, float x, float y) const;
     float gaussianKernel1D(float x, float sigma) const;
     float subpixelPeak(const std::vector<float>& signal, int idx) const;
-    EdgeEstimate refineEdge(const std::vector<float>& abs_grad,
+    EdgeEstimate refineEdge(const std::vector<float>& response,
                             int start,
                             int end,
                             float scan_length) const;
@@ -44,4 +48,6 @@ private:
     int multi_scan_count_;
     int edge_refine_half_window_;
     float edge_power_gamma_;
+    float min_edge_length_ratio_;
+    bool fallback_to_abs_gradient_;
 };
