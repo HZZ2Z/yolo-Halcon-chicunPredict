@@ -4,7 +4,6 @@
 #include "calibration.hpp"
 #include "camera_provider.hpp"
 #include "onnx_inferencer.hpp"
-#include "spatial_error_compensator.hpp"
 #include "subpixel_caliper.hpp"
 #include "tracker_ekf.hpp"
 
@@ -13,7 +12,6 @@ PipelineContext::~PipelineContext() {
     visualizer.reset();
     tracker.reset();
     caliper.reset();
-    compensator.reset();
     inferencer.reset();
     calibration.reset();
     camera.reset();

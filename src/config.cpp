@@ -52,8 +52,6 @@ void validateConfig(const AppConfig& config) {
     requireRange(config.max_frame_jump_mm > 0.0f, "max_frame_jump_mm 必须 > 0");
     requireRange(config.min_edge_length_ratio > 0.0f && config.min_edge_length_ratio <= 1.0f,
                  "min_edge_length_ratio 必须在 (0, 1] 区间");
-    requireRange(config.standard_true_mm < 0.0f || config.standard_true_mm > 0.0f,
-                 "standard_true_mm 必须 > 0，或设置为负数表示未知");
     requireRange(config.display_max_width > 0, "display_max_width 必须 > 0");
     requireRange(config.display_max_height > 0, "display_max_height 必须 > 0");
 }
@@ -125,18 +123,6 @@ AppConfig LoadConfig(const std::string& yaml_path) {
     readIfExists(root, "fallback_to_abs_gradient", fallback_to_abs_gradient);
     config.fallback_to_abs_gradient = fallback_to_abs_gradient != 0;
 
-    int enable_measurement_csv = config.enable_measurement_csv ? 1 : 0;
-    readIfExists(root, "enable_measurement_csv", enable_measurement_csv);
-    config.enable_measurement_csv = enable_measurement_csv != 0;
-    readIfExists(root, "measurement_csv_path", config.measurement_csv_path);
-    readIfExists(root, "standard_true_mm", config.standard_true_mm);
-    readIfExists(root, "residual_compensation_file", config.residual_compensation_file);
-
-    int show_grid_guide = config.show_grid_guide ? 1 : 0;
-    readIfExists(root, "show_grid_guide", show_grid_guide);
-    config.show_grid_guide = show_grid_guide != 0;
-    readIfExists(root, "grid_guide_position", config.grid_guide_position);
-
     int show_window = config.show_window ? 1 : 0;
     readIfExists(root, "show_window", show_window);
     config.show_window = show_window != 0;
@@ -167,8 +153,6 @@ AppConfig LoadConfig(const std::string& yaml_path) {
     resolvePath(config.onnx_model_path);
     resolvePath(config.class_names_path);
     resolvePath(config.calibration_file);
-    resolvePath(config.measurement_csv_path);
-    resolvePath(config.residual_compensation_file);
 
     return config;
 }

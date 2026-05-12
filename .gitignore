@@ -18,7 +18,10 @@ __pycache__/
 
 # Measurement and calibration experiment outputs
 measurements/*
-!measurements/.gitkeep
+
+# Local desktop runtime data
+data/
+/*.desktop
 
 # Editor/OS noise
 .vscode/

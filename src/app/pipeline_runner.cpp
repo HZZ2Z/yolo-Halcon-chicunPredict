@@ -12,6 +12,10 @@
 #include <thread>
 
 int RunPipeline(const AppConfig& cfg) {
+    return RunPipeline(cfg, nullptr);
+}
+
+int RunPipeline(const AppConfig& cfg, const PipelineCallbacks* callbacks) {
     PipelineContext context;
     if (!InitializePipeline(cfg, context)) {
         return 1;
@@ -23,6 +27,10 @@ int RunPipeline(const AppConfig& cfg) {
     std::thread producer([&]() {
         uint64_t fid = 0;
         while (!stop_requested.load()) {
+            if (callbacks && callbacks->should_stop && callbacks->should_stop()) {
+                stop_requested.store(true);
+                break;
+            }
             if (cfg.max_frames > 0 && fid >= static_cast<uint64_t>(cfg.max_frames)) {
                 break;
             }
@@ -40,6 +48,11 @@ int RunPipeline(const AppConfig& cfg) {
         FrameProcessorState state;
 
         while (true) {
+            if (callbacks && callbacks->should_stop && callbacks->should_stop()) {
+                stop_requested.store(true);
+                queue.close();
+                break;
+            }
             auto frame_opt = queue.pop();
             if (!frame_opt.has_value()) {
                 break;
@@ -49,7 +62,8 @@ int RunPipeline(const AppConfig& cfg) {
                              context,
                              state,
                              stop_requested,
-                             queue)) {
+                             queue,
+                             callbacks)) {
                 break;
             }
         }

@@ -37,7 +37,6 @@ struct MeasurementResult {
     float measurement_quality = 0.0f;
     bool quality_ok = true;
     std::string quality_reason = "OK";
-    float correction_mm = 0.0f;
 };
 
 inline float deg2rad(float deg) {

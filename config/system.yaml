@@ -35,11 +35,6 @@ app:
   min_edge_length_ratio: 0.82
   fallback_to_abs_gradient: 1
 
-  enable_measurement_csv: 0
-  measurement_csv_path: "measurements/measurement_log.csv"
-  standard_true_mm: -1.0
-  residual_compensation_file: ""
-
   show_window: 1
   display_max_width: 1280
   display_max_height: 760

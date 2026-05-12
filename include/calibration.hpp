@@ -17,6 +17,7 @@ public:
     cv::Point2f pixelToWorld(const cv::Point2f& px) const;
     bool hasHomography() const;
     bool canMeasureInMm() const;
+    const std::string& fingerprint() const;
     void logScaleDiagnostics(int image_width, int image_height) const;
 
 private:
@@ -30,4 +31,5 @@ private:
 #endif
     bool ready_ = false;
     bool projection_valid_ = false;
+    std::string fingerprint_;
 };

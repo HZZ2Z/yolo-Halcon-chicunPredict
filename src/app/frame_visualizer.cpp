@@ -3,11 +3,8 @@
 #include <opencv2/opencv.hpp>
 
 #include <algorithm>
-#include <array>
-#include <cctype>
 #include <cmath>
 #include <string>
-#include <vector>
 
 namespace {
 
@@ -66,107 +63,13 @@ std::string qualitySuggestion(const std::string& reason) {
     return "Check placement, light and edge visibility";
 }
 
-void drawGridGuide(cv::Mat& image, const std::string& position) {
-    static const std::array<std::array<const char*, 3>, 3> labels{{
-        {{"LT", "CT", "RT"}},
-        {{"LC", "C", "RC"}},
-        {{"LB", "CB", "RB"}},
-    }};
-
-    if (image.empty()) {
-        return;
-    }
-
-    std::string target = position;
-    std::transform(target.begin(), target.end(), target.begin(), [](unsigned char c) {
-        return static_cast<char>(std::toupper(c));
-    });
-    if (target.empty()) {
-        target = "C";
-    }
-
-    const int w = image.cols;
-    const int h = image.rows;
-    const int left = std::max(8, w / 14);
-    const int right = std::min(w - 8, w - w / 14);
-    const int top = std::max(8, h / 11);
-    const int bottom = std::min(h - 70, h - h / 11);
-    const int grid_w = right - left;
-    const int grid_h = bottom - top;
-
-    cv::Mat overlay = image.clone();
-    for (int row = 0; row < 3; ++row) {
-        for (int col = 0; col < 3; ++col) {
-            const int x0 = left + grid_w * col / 3;
-            const int x1 = left + grid_w * (col + 1) / 3;
-            const int y0 = top + grid_h * row / 3;
-            const int y1 = top + grid_h * (row + 1) / 3;
-            const std::string label = labels[row][col];
-            const bool active = label == target;
-            const cv::Scalar color = active ? cv::Scalar(0, 220, 255) : cv::Scalar(80, 220, 80);
-            const int thickness = active ? 4 : 2;
-
-            if (active) {
-                cv::rectangle(overlay, cv::Rect(cv::Point(x0, y0), cv::Point(x1, y1)),
-                              cv::Scalar(0, 120, 255), cv::FILLED);
-            }
-            cv::rectangle(image, cv::Point(x0, y0), cv::Point(x1, y1), color, thickness);
-
-            const cv::Point center((x0 + x1) / 2, (y0 + y1) / 2);
-            cv::drawMarker(image, center, color, cv::MARKER_CROSS, active ? 28 : 18, thickness);
-            putOutlinedText(image, label, cv::Point(center.x - 22, center.y - 12),
-                            active ? 0.9 : 0.6, color, thickness);
-        }
-    }
-
-    cv::addWeighted(overlay, 0.22, image, 0.78, 0.0, image);
-    cv::rectangle(image, cv::Point(left, top), cv::Point(right, bottom), cv::Scalar(80, 220, 80), 2);
-    putOutlinedText(image, "GRID POSITION: " + target, cv::Point(left, std::max(28, top - 16)),
-                    0.9, cv::Scalar(0, 220, 255), 2);
-}
-
-void drawGridInstructions(cv::Mat& image, const std::string& position) {
-    if (image.empty()) {
-        return;
-    }
-
-    std::string target = position.empty() ? "C" : position;
-    std::transform(target.begin(), target.end(), target.begin(), [](unsigned char c) {
-        return static_cast<char>(std::toupper(c));
-    });
-
-    const std::vector<std::string> lines = {
-        "Place the standard part in grid " + target,
-        "Adjust until OBB and edge points are stable",
-        "Press q or Esc to finish preview"
-    };
-
-    const int panel_h = 92;
-    const int y0 = std::max(0, image.rows - panel_h - 8);
-    cv::Mat overlay = image.clone();
-    cv::rectangle(overlay, cv::Point(12, y0), cv::Point(image.cols - 12, image.rows - 12),
-                  cv::Scalar(20, 20, 20), cv::FILLED);
-    cv::addWeighted(overlay, 0.42, image, 0.58, 0.0, image);
-
-    int y = y0 + 26;
-    for (const std::string& line : lines) {
-        putOutlinedText(image, line, cv::Point(26, y), 0.65, cv::Scalar(255, 255, 255), 2);
-        y += 26;
-    }
-}
-
 } // namespace
 
-bool FrameVisualizer::render(const AppConfig& cfg,
-                             const CalibrationMapper& calibration,
-                             cv::Mat& image,
-                             const OBBResult& tracked,
-                             const MeasurementResult& last_measurement) const {
-    if (cfg.show_grid_guide) {
-        drawGridGuide(image, cfg.grid_guide_position);
-        drawGridInstructions(image, cfg.grid_guide_position);
-    }
-
+void FrameVisualizer::drawOverlay(const AppConfig& cfg,
+                                  const CalibrationMapper& calibration,
+                                  cv::Mat& image,
+                                  const OBBResult& tracked,
+                                  const MeasurementResult& last_measurement) const {
     if (tracked.class_id >= 0 && tracked.confidence > 0.0f &&
         tracked.rrect.size.width > 1.0f && tracked.rrect.size.height > 1.0f) {
         cv::Point2f pts[4];
@@ -210,6 +113,14 @@ bool FrameVisualizer::render(const AppConfig& cfg,
         putOutlinedText(image, qualitySuggestion(last_measurement.quality_reason),
                         cv::Point(20, 180), 0.65, cv::Scalar(0, 200, 255), 2);
     }
+}
+
+bool FrameVisualizer::render(const AppConfig& cfg,
+                             const CalibrationMapper& calibration,
+                             cv::Mat& image,
+                             const OBBResult& tracked,
+                             const MeasurementResult& last_measurement) const {
+    drawOverlay(cfg, calibration, image, tracked, last_measurement);
 
     prepareDisplayWindow(cfg, image);
     cv::imshow(kWindowName, image);

@@ -5,7 +5,6 @@
 #include "camera_provider.hpp"
 #include "logger.hpp"
 #include "onnx_inferencer.hpp"
-#include "spatial_error_compensator.hpp"
 #include "subpixel_caliper.hpp"
 #include "tracker_ekf.hpp"
 
@@ -58,12 +57,6 @@ bool InitializePipeline(const AppConfig& cfg, PipelineContext& context) {
                                                         cfg.edge_power_gamma,
                                                         cfg.min_edge_length_ratio,
                                                         cfg.fallback_to_abs_gradient);
-    context.compensator = std::make_unique<SpatialErrorCompensator>();
-    if (!cfg.residual_compensation_file.empty()) {
-        if (!context.compensator->load(cfg.residual_compensation_file)) {
-            logger::Warn("警告: 残差补偿文件加载失败，当前运行不启用空间残差补偿。");
-        }
-    }
     context.tracker = std::make_unique<ObbTracker>();
     context.visualizer = std::make_unique<FrameVisualizer>();
 

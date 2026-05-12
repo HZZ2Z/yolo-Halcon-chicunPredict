@@ -8,7 +8,6 @@ class OnnxObbInferencer;
 class SubpixelCaliper;
 class ObbTracker;
 class FrameVisualizer;
-class SpatialErrorCompensator;
 
 struct PipelineContext {
     PipelineContext();
@@ -24,5 +23,4 @@ struct PipelineContext {
     std::unique_ptr<SubpixelCaliper> caliper;
     std::unique_ptr<ObbTracker> tracker;
     std::unique_ptr<FrameVisualizer> visualizer;
-    std::unique_ptr<SpatialErrorCompensator> compensator;
 };

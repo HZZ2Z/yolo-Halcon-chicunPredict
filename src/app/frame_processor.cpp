@@ -5,14 +5,11 @@
 #include "logger.hpp"
 #include "measurement_uncertainty.hpp"
 #include "onnx_inferencer.hpp"
-#include "spatial_error_compensator.hpp"
 #include "subpixel_caliper.hpp"
 #include "tracker_ekf.hpp"
 
 #include <algorithm>
 #include <cmath>
-#include <filesystem>
-#include <fstream>
 #include <iomanip>
 #include <sstream>
 #include <vector>
@@ -81,67 +78,6 @@ std::string evaluateMeasurementQuality(const AppConfig& cfg,
         }
     }
     return "OK";
-}
-
-void ensureCsvOpen(const AppConfig& cfg, FrameProcessorState& state) {
-    if (!cfg.enable_measurement_csv || state.csv.is_open()) {
-        return;
-    }
-
-    const std::filesystem::path path(cfg.measurement_csv_path);
-    if (path.has_parent_path()) {
-        std::error_code ec;
-        std::filesystem::create_directories(path.parent_path(), ec);
-    }
-
-    const bool needs_header =
-        !std::filesystem::exists(path) || std::filesystem::file_size(path) == 0;
-    state.csv.open(path, std::ios::app);
-    if (!state.csv.is_open()) {
-        logger::Warn(std::string("[CSV] 无法打开测量记录文件: ") + cfg.measurement_csv_path);
-        return;
-    }
-    state.csv_header_written = !needs_header;
-    if (!state.csv_header_written) {
-        state.csv << "frame_id,cx,cy,angle,px,raw_mm,mm,sigma,scans,quality,"
-                     "correction_mm,true_mm,error_mm\n";
-        state.csv_header_written = true;
-    }
-}
-
-void writeMeasurementCsv(const AppConfig& cfg,
-                         FrameProcessorState& state,
-                         const MeasurementResult& mr,
-                         const OBBResult& tracked) {
-    if (!cfg.enable_measurement_csv) {
-        return;
-    }
-    ensureCsvOpen(cfg, state);
-    if (!state.csv.is_open()) {
-        return;
-    }
-
-    const float true_mm = cfg.standard_true_mm > 0.0f ? cfg.standard_true_mm : -1.0f;
-    const float error_mm =
-        (true_mm > 0.0f && mr.raw_world_distance_mm > 0.0f)
-            ? (mr.raw_world_distance_mm - true_mm)
-            : -1.0f;
-
-    state.csv << std::fixed << std::setprecision(6)
-              << mr.frame_id << ','
-              << tracked.rrect.center.x << ','
-              << tracked.rrect.center.y << ','
-              << tracked.rrect.angle << ','
-              << mr.pixel_distance << ','
-              << mr.raw_world_distance_mm << ','
-              << mr.world_distance_mm << ','
-              << mr.world_sigma_mm << ','
-              << mr.valid_scan_count << ','
-              << mr.quality_reason << ','
-              << mr.correction_mm << ','
-              << true_mm << ','
-              << error_mm << '\n';
-    state.csv.flush();
 }
 
 bool isFinitePoint(const cv::Point2f& p) {
@@ -262,7 +198,8 @@ bool ProcessFrame(FrameData frame,
                   PipelineContext& context,
                   FrameProcessorState& state,
                   std::atomic<bool>& stop_requested,
-                  ThreadSafeQueue<FrameData>& queue) {
+                  ThreadSafeQueue<FrameData>& queue,
+                  const PipelineCallbacks* callbacks) {
     ++state.processed_frames;
     frame.image = context.calibration->undistort(frame.image);
 
@@ -294,14 +231,6 @@ bool ProcessFrame(FrameData frame,
                             mr,
                             cfg.huber_delta_mm,
                             cfg.estimate_measurement_uncertainty);
-        if (context.compensator && context.compensator->ready() &&
-            mr.raw_world_distance_mm > 0.0f && std::isfinite(mr.raw_world_distance_mm)) {
-            const float corr = context.compensator->correction(tracked.rrect.center.x,
-                                                               tracked.rrect.center.y);
-            mr.correction_mm = corr;
-            mr.raw_world_distance_mm += corr;
-            mr.world_distance_mm += corr;
-        }
 
         const std::string quality = evaluateMeasurementQuality(cfg, mr, state);
         mr.quality_ok = quality == "OK";
@@ -317,7 +246,6 @@ bool ProcessFrame(FrameData frame,
                          ", scans=" + std::to_string(mr.valid_scan_count));
             state.last_measurement = mr;
         }
-        writeMeasurementCsv(cfg, state, mr, tracked);
     }
 
     if (cfg.show_window) {
@@ -333,6 +261,16 @@ bool ProcessFrame(FrameData frame,
             queue.close();
             return true;
         }
+    }
+
+    if (callbacks && callbacks->on_frame) {
+        cv::Mat display = frame.image.clone();
+        context.visualizer->drawOverlay(cfg,
+                                        *context.calibration,
+                                        display,
+                                        tracked,
+                                        state.last_measurement);
+        callbacks->on_frame(display, tracked, state.last_measurement);
     }
 
     return false;

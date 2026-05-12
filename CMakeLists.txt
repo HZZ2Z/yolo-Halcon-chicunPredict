@@ -15,6 +15,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
 option(USE_ONNXRUNTIME "Enable ONNX Runtime inference" OFF)
 option(USE_MVS "Enable Hikrobot MVS SDK camera backend" ON)
 option(USE_HALCON "Enable HALCON calibration backend" ON)
+option(BUILD_DESKTOP "Build Qt desktop application when Qt is available" ON)
 
 if(NOT OpenCV_DIR)
     set(_opencv_candidates
@@ -64,7 +65,6 @@ add_library(metal_core STATIC
     src/calibration.cpp
     src/subpixel_caliper.cpp
     src/measurement_uncertainty.cpp
-    src/spatial_error_compensator.cpp
 )
 
 target_include_directories(metal_core PUBLIC
@@ -89,6 +89,31 @@ add_executable(metal_metrology
 )
 
 target_link_libraries(metal_metrology PRIVATE metal_app)
+
+if(BUILD_DESKTOP)
+    find_package(Qt6 QUIET COMPONENTS Widgets Sql)
+    if(Qt6_FOUND)
+        set(_desktop_qt_libs Qt6::Widgets Qt6::Sql)
+    else()
+        find_package(Qt5 QUIET COMPONENTS Widgets Sql)
+        if(Qt5_FOUND)
+            set(_desktop_qt_libs Qt5::Widgets Qt5::Sql)
+        endif()
+    endif()
+
+    if(_desktop_qt_libs)
+        add_executable(metal_metrology_desktop
+            src/desktop/main_desktop.cpp
+            src/desktop/main_window.cpp
+            src/desktop/measurement_database.cpp
+            src/desktop/desktop_theme.cpp
+            src/desktop/desktop_widgets.cpp
+        )
+        target_link_libraries(metal_metrology_desktop PRIVATE metal_app ${_desktop_qt_libs})
+    else()
+        message(WARNING "BUILD_DESKTOP=ON 但未找到 Qt Widgets/Sql，跳过 metal_metrology_desktop。安装 Qt 开发包后会自动构建桌面端。")
+    endif()
+endif()
 
 set(_runtime_rpaths "")
 

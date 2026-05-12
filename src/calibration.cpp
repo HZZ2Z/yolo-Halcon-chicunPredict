@@ -6,7 +6,9 @@
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <limits>
+#include <sstream>
 #include <system_error>
 #include <string>
 #include <vector>
@@ -37,6 +39,27 @@ bool isLikelyPoseDat(const fs::path& file_path) {
             buf.find("Translation vector") != std::string::npos);
 }
 
+void hashFile(const fs::path& file_path, uint64_t& hash) {
+    std::ifstream ifs(file_path, std::ios::binary);
+    char c = 0;
+    while (ifs.get(c)) {
+        hash ^= static_cast<unsigned char>(c);
+        hash *= 1099511628211ull;
+    }
+}
+
+std::string makeCalibrationFingerprint(const fs::path& campar_path, const fs::path& pose_path) {
+    uint64_t hash = 1469598103934665603ull;
+    hashFile(campar_path, hash);
+    hash ^= 0xffu;
+    hash *= 1099511628211ull;
+    hashFile(pose_path, hash);
+
+    std::ostringstream oss;
+    oss << std::hex << std::setw(16) << std::setfill('0') << hash;
+    return oss.str();
+}
+
 } // namespace
 
 bool CalibrationMapper::load(const std::string& calibration_path,
@@ -49,6 +72,7 @@ bool CalibrationMapper::load(const std::string& calibration_path,
 
     ready_ = false;
     projection_valid_ = false;
+    fingerprint_.clear();
 
     if (calibration_path.empty()) {
         return false;
@@ -159,6 +183,7 @@ bool CalibrationMapper::loadFromFiles(const std::string& campar_path, const std:
                      ", pose=" + halcon_pose_path);
         HalconCpp::ReadCamPar(halcon_campar_path.c_str(), &cam_param_);
         HalconCpp::ReadPose(halcon_pose_path.c_str(), &world_pose_);
+        fingerprint_ = makeCalibrationFingerprint(campar_path, pose_path);
         ready_ = true;
         return true;
     } catch (const HalconCpp::HException& e) {
@@ -168,6 +193,7 @@ bool CalibrationMapper::loadFromFiles(const std::string& campar_path, const std:
         logger::Error(std::string("[HALCON] 异常: ") + e.ErrorMessage().Text());
         ready_ = false;
         projection_valid_ = false;
+        fingerprint_.clear();
         return false;
     }
 #else
@@ -229,6 +255,10 @@ bool CalibrationMapper::hasHomography() const {
 
 bool CalibrationMapper::canMeasureInMm() const {
     return projection_valid_;
+}
+
+const std::string& CalibrationMapper::fingerprint() const {
+    return fingerprint_;
 }
 
 cv::Point2f CalibrationMapper::pixelToWorld(const cv::Point2f& px) const {

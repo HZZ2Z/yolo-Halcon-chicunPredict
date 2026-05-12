@@ -39,14 +39,6 @@ struct AppConfig {
     float min_edge_length_ratio = 0.82f;
     bool fallback_to_abs_gradient = true;
 
-    bool enable_measurement_csv = false;
-    std::string measurement_csv_path = "measurements.csv";
-    float standard_true_mm = -1.0f;
-    std::string residual_compensation_file;
-
-    bool show_grid_guide = false;
-    std::string grid_guide_position;
-
     bool show_window = true;
     int display_max_width = 1280;
     int display_max_height = 760;
